@@ -1,0 +1,83 @@
+version: "3"
+services:
+  postgres:
+    image: postgres:15
+    restart: always
+    ports:
+      - 5432:5432
+    environment: 
+      - POSTGRES_DB=keycloak
+      - POSTGRES_PASSWORD=adminadmin
+      - PGDATA=/var/lib/postgresql/data/pgdata
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    #env_file:
+    #  - ./postgres.env
+    
+  keycloak:
+    image: keycloak/keycloak
+    restart: always
+    depends_on:
+      - postgres
+    ports:
+      - 8443:8443
+      - 8081:8080
+    environment:
+      - KEYCLOAK_ADMIN=admin
+      - KEYCLOAK_ADMIN_PASSWORD=adminadmin
+      - KC_DB=postgres
+      - KC_DB_URL=jdbc:postgresql://postgres:5432/keycloak
+      - KC_DB_USERNAME=postgres
+      - KC_DB_PASSWORD=adminadmin
+      # - KC_HOSTNAME=dev.int
+    command: start-dev
+    #command: start --optimized  
+    #env_file:
+    #  - ./keycloak.env
+    
+  minio:
+    image: minio/minio:RELEASE.2022-10-15T19-57-03Z
+    restart: always
+    ports: 
+      - 9000:9000
+      - 9090:9090
+    environment:
+      - MINIO_ROOT_USER=admin
+      - MINIO_ROOT_PASSWORD=adminadmin
+    volumes:
+      - minio:/data
+    command: server /data --console-address ":9090"
+    #env_file:
+    #  - ./minio.env
+  
+  zookeeper:
+    image: docker.io/bitnami/zookeeper:3.8
+    ports:
+      - 2181:2181
+    volumes:
+      - zookeeper_data:/bitnami
+    environment:
+      - ALLOW_ANONYMOUS_LOGIN=yes
+    #env_file:
+    #  - ./zookeeper.env
+
+  kafka:
+    image: docker.io/bitnami/kafka:3.3
+    ports:
+      - 9092:9092
+    volumes:
+      - kafka_data:/bitnami
+    depends_on:
+      - zookeeper
+    #env_file:
+    #  - ./kafka.env
+
+volumes:
+  postgres:
+    driver: local
+  minio:
+    driver: local
+  zookeeper_data:
+    driver: local
+  kafka_data:
+    driver: local
