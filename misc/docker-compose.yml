@@ -73,6 +73,23 @@ services:
     #env_file:
     #  - ./kafka.env
 
+  # template-project:
+  #   image: template-project
+  #   ports:
+  #     - 9999:9999
+  #   depends_on:
+  #     - postgres
+  #   environment:
+  #     - NODE_ENV=production
+  #     - PRODUCTION_IP=0.0.0.0
+  #     - PRODUCTION_PORT=9999
+  #     - PRODUCTION_USERNAME=postgres
+  #     - PRODUCTION_PASSWORD=adminadmin
+  #     - PRODUCTION_DATABASE=keycloak
+  #     - PRODUCTION_DB_HOST=postgres
+  #     - PRODUCTION_DB_SSL=false
+  #     - PRODUCTION_DIALECT=postgres
+
 volumes:
   postgres:
     driver: local
