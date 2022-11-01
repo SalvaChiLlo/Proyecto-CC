@@ -4,12 +4,11 @@ import { Consumer, Producer, RecordMetadata, Kafka, Partitioners } from "kafkajs
 import { Job } from "./Job"
 import { config } from './config/environment/';
 
-const brokers: string[] = [config.kafka];
-console.log(brokers);
+console.log(config.kafka);
 
 const kafka = new Kafka({
-  clientId: 'frontend',
-  brokers
+  clientId: 'frontend' + Date.now() * Math.random(),
+  brokers: config.kafka
 })
 const producer: Producer = kafka.producer({ createPartitioner: Partitioners.LegacyPartitioner })
 const consumer: Consumer = kafka.consumer({ groupId: 'frontend-group' })

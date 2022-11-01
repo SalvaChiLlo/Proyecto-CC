@@ -5,12 +5,11 @@ import { Job } from "./Job"
 const { Kafka, Partitioners } = require('kafkajs')
 import { Producer } from "kafkajs";
 
-const brokers: string[] = [config.kafka];
-console.log(brokers);
+console.log(config.kafka);
 
 const kafka = new Kafka({
   clientId: 'worker',
-  brokers
+  brokers: config.kafka
 })
 
 const producer: Producer = kafka.producer({ createPartitioner: Partitioners.LegacyPartitioner })
@@ -23,6 +22,7 @@ const run = async () => {
 
   await consumer.run({
     eachMessage: async ({ topic, partition, message }) => {
+      console.log({value: message.value, offset: message.offset, partition})
       const job: Job = JSON.parse(message.value.toString());
       await execJob(job, partition);
     },
