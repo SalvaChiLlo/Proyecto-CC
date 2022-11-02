@@ -22,23 +22,23 @@ services:
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-  worker:
-    build: ./worker
-    depends_on:
-      - kafka
-    environment:
-      - NODE_ENV=production
-      - PRODUCTION_IP=0.0.0.0
-      - PRODUCTION_KAFKA_URL=kafka:9092
+  # worker:
+  #   build: ./worker
+  #   depends_on:
+  #     - kafka
+  #   environment:
+  #     - NODE_ENV=production
+  #     - PRODUCTION_IP=0.0.0.0
+  #     - PRODUCTION_KAFKA_URL=kafka:9092
 
-  frontend:
-    build: ./frontend
-    depends_on:
-      - kafka
-    environment:
-      - NODE_ENV=production
-      - PRODUCTION_PORT=9000
-      - PRODUCTION_IP=0.0.0.0
-      - PRODUCTION_KAFKA_URL=kafka:9092
-    ports:
-      - 9000:9000
+  # frontend:
+  #   build: ./frontend
+  #   depends_on:
+  #     - kafka
+  #   environment:
+  #     - NODE_ENV=production
+  #     - PRODUCTION_PORT=9000
+  #     - PRODUCTION_IP=0.0.0.0
+  #     - PRODUCTION_KAFKA_URL=kafka:9092
+  #   ports:
+  #     - 9000:9000

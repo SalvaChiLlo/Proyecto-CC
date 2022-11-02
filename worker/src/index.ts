@@ -1,6 +1,7 @@
 import { config } from './config/environment/';
 import { Consumer } from "kafkajs"
 import { Job } from "./Job"
+import { execSync } from 'child_process';
 
 const { Kafka, Partitioners } = require('kafkajs')
 import { Producer } from "kafkajs";
@@ -22,7 +23,7 @@ const run = async () => {
 
   await consumer.run({
     eachMessage: async ({ topic, partition, message }) => {
-      console.log({value: message.value, offset: message.offset, partition})
+      console.log({ value: message.value, offset: message.offset, partition })
       const job: Job = JSON.parse(message.value.toString());
       await execJob(job, partition);
     },
@@ -36,7 +37,14 @@ async function execJob(job: Job, partition: number) {
   console.log("Lanzando Trabajo");
 
   console.log("Ejecutando Trabajo");
-  await wait(3000);
+  console.log(process.env.WORKER_JOB_RESULTS)
+  try {
+    const result = execSync(`mkdir -p ${process.env.WORKER_JOB_RESULTS}; cd ${process.env.WORKER_JOB_RESULTS}; pwd; git clone ${job.url} job; cd job; npm run start -- ${job.args}`);
+    console.log(result.toString());
+  } catch (err: any) {
+    console.error(err.output.toString());
+
+  }
 
   // SEND RESULTS
   console.log("Trabajo Terminado")
