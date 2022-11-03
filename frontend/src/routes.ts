@@ -46,6 +46,8 @@ function addJob(app: Express) {
       await producer.connect();
       const newJob: Job = {
         url: req.body.url,
+        args: req.body.args,
+        config: req.body.config,
         id: Date.now().toString()
       };
 

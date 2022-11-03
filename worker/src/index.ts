@@ -2,6 +2,7 @@ import { config } from './config/environment/';
 import { Consumer } from "kafkajs"
 import { Job } from "./Job"
 import { execSync } from 'child_process';
+import { writeFileSync } from 'fs'
 
 const { Kafka, Partitioners } = require('kafkajs')
 import { Producer } from "kafkajs";
@@ -39,10 +40,24 @@ async function execJob(job: Job, partition: number) {
   console.log("Ejecutando Trabajo");
   console.log(process.env.WORKER_JOB_RESULTS)
   try {
-    const result = execSync(`mkdir -p ${process.env.WORKER_JOB_RESULTS}; cd ${process.env.WORKER_JOB_RESULTS}; pwd; git clone ${job.url} job; cd job; npm run start -- ${job.args}`);
-    console.log(result.toString());
+    const rm0 = execSync(`rm -rf ${process.env.WORKER_JOB_RESULTS}/job;`)
+    const clone = execSync(`mkdir -p ${process.env.WORKER_JOB_RESULTS}; cd ${process.env.WORKER_JOB_RESULTS}; pwd; git clone ${job.url} job;`);
+    console.log("clone", clone.toString())
+    const cd = execSync(`cd ${process.env.WORKER_JOB_RESULTS}/job;`)
+    console.log("cd", cd.toString())
+    console.log(job.config)
+    writeFileSync(`${process.env.WORKER_JOB_RESULTS}/job/config.json`, job.config.toString());
+    
+    const result = execSync(`cd ${process.env.WORKER_JOB_RESULTS}/job && npm install && npm run start -- ${job.args}`)
+    const cp = execSync(`cd ${process.env.WORKER_JOB_RESULTS}/job; cp -r output ../${Date.now()}`)
+    console.log("cp", cp.toString());
+
+    // const rm = execSync(`rm -rf ${process.env.WORKER_JOB_RESULTS}/job;`)
+    // console.log("rm", rm.toString());
+
+    console.log("result", result.toString());
   } catch (err: any) {
-    console.error(err.output.toString());
+    console.error(err);
 
   }
 
