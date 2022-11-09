@@ -1,38 +1,51 @@
 # Proyecto Cloud Computing
 
 ## Frontend - API
+### POST /getToken
+#### Request
 ```
-POST | /getToken
-  body: {
-          "username": "myUsername",
-          "password": "myPassword"
-        }
-  response: {
-              "token": "yourBearerToken"
-            }
+body: {
+        "username": "myUsername",
+        "password": "myPassword"
+      }
 ```
 
+#### Response
 ```
-POST | /addJob
-  headers:
-    authentication: Bearer yourBearerToken
-  body: {
-          "url": "https://username:password@github.com/SalvaChiLlo/jobCC.git",
-          "args": "Arguments for your executable ## This string will be appended to your executable",
-          "config": "Your custom config in JSON ## This content will be written to your root project folder on config.json"
-        }
-  response: {
-              "jobId": "yourJobId"
-            }
+response: {
+            "token": "yourBearerToken"
+          }
 ```
 
+### POST | /addJob
+#### Request
 ```
-GET | /status/{jobId}
-  headers:
-    authentication: Bearer yourBearerToken
-  response: {
-              "status": "Pendiente" | "Finalizado"
-            }
+headers:
+  authentication: Bearer yourBearerToken
+body: {
+        "url": "https://username:password@github.com/SalvaChiLlo/jobCC.git",
+        "args": "Arguments for your executable ## This string will be appended to your executable",
+        "config": "Your custom config in JSON ## This content will be written to your root project folder on config.json"
+      }
+```
+#### Response
+```
+response: {
+            "jobId": "yourJobId"
+          }
+```
+
+### GET | /status/{jobId}
+#### Request
+```
+headers:
+  authentication: Bearer yourBearerToken
+```
+#### Response
+```
+response: {
+            "status": "Pendiente" | "Finalizado"
+          }
 ```
 
 ## Job definition standard
@@ -46,7 +59,7 @@ This does not restric to just launch Javascript/Typescript projects. Inside your
   
   # For a Rust project you could start it as follows:
   ...
-  "start": "rustup main.rs && ./main.rs"
+  "start": "rustc main.rs && ./main.rs"
   ...
 ```
 
