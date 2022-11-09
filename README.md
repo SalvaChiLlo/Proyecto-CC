@@ -2,37 +2,37 @@
 
 ## Frontend - API
 ```
-  POST | /getToken
-    body: {
-            "username": "myUsername",
-            "password": "myPassword"
-          }
-    response: {
-                "token": "yourBearerToken"
-              }
+POST | /getToken
+  body: {
+          "username": "myUsername",
+          "password": "myPassword"
+        }
+  response: {
+              "token": "yourBearerToken"
+            }
 ```
 
 ```
-  POST | /addJob
-    headers:
-      authentication: Bearer yourBearerToken
-    body: {
-            "url": "https://username:password@github.com/SalvaChiLlo/jobCC.git",
-            "args": "Arguments for your executable ## This string will be appended to your executable",
-            "config": "Your custom config in JSON ## This content will be written to your root project folder on config.json"
-          }
-    response: {
-                "jobId": "yourJobId"
-              }
+POST | /addJob
+  headers:
+    authentication: Bearer yourBearerToken
+  body: {
+          "url": "https://username:password@github.com/SalvaChiLlo/jobCC.git",
+          "args": "Arguments for your executable ## This string will be appended to your executable",
+          "config": "Your custom config in JSON ## This content will be written to your root project folder on config.json"
+        }
+  response: {
+              "jobId": "yourJobId"
+            }
 ```
 
 ```
-  GET | /status/{jobId}
-    headers:
-      authentication: Bearer yourBearerToken
-    response: {
-                "status": "Pendiente" | "Finalizado"
-              }
+GET | /status/{jobId}
+  headers:
+    authentication: Bearer yourBearerToken
+  response: {
+              "status": "Pendiente" | "Finalizado"
+            }
 ```
 
 ## Job definition standard
