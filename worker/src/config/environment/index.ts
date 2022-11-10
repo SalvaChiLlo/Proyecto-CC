@@ -11,7 +11,8 @@ const configEnv = {
   FINALIZADO: 'Finalizado',
   ESPERA: 'En espera',
   FALLO: 'Fallido',
-  LANZADO: 'Lanzado' 
+  LANZADO: 'Lanzado',
+  WORKER_DATA_FOLDER: process.env.WORKER_DATA_FOLDER
 }
 
 export const config = Object.assign(configEnv, envFile || {})

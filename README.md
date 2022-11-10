@@ -1,8 +1,42 @@
 # Proyecto Cloud Computing
 
-## Frontend - API
-### POST /getToken
-#### Request
+## Frontend
+### /api
+#### POST /addJob
+##### Request
+```
+headers:
+  Authorization: Bearer yourBearerToken
+body: {
+        "url": "https://username:password@github.com/SalvaChiLlo/jobCC.git",
+        "args": "Arguments for your executable ## This string will be appended to your executable",
+        "config": "Your custom config in JSON ## This content will be written to your root project folder on config.json"
+      }
+```
+##### Response
+```
+response: {
+            "jobId": "yourJobId"
+          }
+```
+
+#### GET /status/{jobId}
+##### Request
+```
+headers:
+  Authorization: Bearer yourBearerToken
+```
+##### Response
+```
+response: {
+            "id": string,
+            "status": string,
+            "outputFiles": ["url://file1", "url://file2"]
+          }
+```
+### /auth
+#### POST /getToken
+##### Request
 ```
 body: {
         "username": "myUsername",
@@ -10,57 +44,39 @@ body: {
       }
 ```
 
-#### Response
+##### Response
 ```
 response: {
             "token": "yourBearerToken"
           }
 ```
 
-### POST | /addJob
-#### Request
+### /health
+#### GET /
+##### Response
 ```
-headers:
-  authentication: Bearer yourBearerToken
-body: {
-        "url": "https://username:password@github.com/SalvaChiLlo/jobCC.git",
-        "args": "Arguments for your executable ## This string will be appended to your executable",
-        "config": "Your custom config in JSON ## This content will be written to your root project folder on config.json"
-      }
-```
-#### Response
-```
-response: {
-            "jobId": "yourJobId"
-          }
-```
-
-### GET | /status/{jobId}
-#### Request
-```
-headers:
-  authentication: Bearer yourBearerToken
-```
-#### Response
-```
-response: {
-            "status": "Pendiente" | "Finalizado"
-          }
+response: <h1>Server is Running</h1>
 ```
 
 ## Job definition standard
 Every project needs to initialize a npm project because we need package.json for launching with `npm run start`.
 This does not restric to just launch Javascript/Typescript projects. Inside your package.json, you can define any command to execute. For example:
 ``` json
-  # For a JS project you could start it as follows:
+# For a JS project you could start it as follows:
+...
+"scripts": {
+  "start": "node src/index.js",
   ...
-  "start": "node src/index.js"
+}
+...
+
+# For a Rust project you could start it as follows:
+...
+"scripts": {
+  "start": "rustc main.rs && ./main.rs",
   ...
-  
-  # For a Rust project you could start it as follows:
-  ...
-  "start": "rustc main.rs && ./main.rs"
-  ...
+}
+...
 ```
 
 As explained in API definition, if you pass a config in the API call it will be written in your project root folder as *config.json*.

@@ -1,4 +1,4 @@
-FROM node:lts-alpine3.15
+FROM node:lts-bullseye
 
 WORKDIR /usr/src/app
 COPY . .

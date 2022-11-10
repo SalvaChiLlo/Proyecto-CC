@@ -7,7 +7,7 @@ import { updateJobStatus } from "../utils/kafka";
 export default async function executeJob(job: Job): Promise<JobStatus> {
   let jobStdout: string = "";
   let jobStderr: string = "";
-  const projectFolder = `${process.env.WORKER_DATA_FOLDER}/${job.id}`
+  const projectFolder = `${config.WORKER_DATA_FOLDER}/${job.id}`
   const jobStatus: JobStatus = {
     id: job.id,
     status: config.LANZADO
@@ -16,7 +16,7 @@ export default async function executeJob(job: Job): Promise<JobStatus> {
   try {
     // Por prevención eliminamos la carpeta donde se va a crear el proyecto por si por algún casual esta ya existiese.
     execSync(`rm -rf ${projectFolder}`)
-    const clone = execSync(`mkdir -p ${process.env.WORKER_DATA_FOLDER}; cd ${process.env.WORKER_DATA_FOLDER}; pwd; git clone ${job.url} ${job.id};`);
+    const clone = execSync(`mkdir -p ${config.WORKER_DATA_FOLDER}; cd ${config.WORKER_DATA_FOLDER}; pwd; git clone ${job.url} ${job.id};`);
     jobStdout += clone;
     const cd = execSync(`cd ${projectFolder};`)
     jobStdout += cd;
