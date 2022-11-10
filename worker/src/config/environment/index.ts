@@ -7,7 +7,11 @@ if (env === 'production') {
 }
 
 const configEnv = {
-  env
+  env,
+  FINALIZADO: 'Finalizado',
+  ESPERA: 'En espera',
+  FALLO: 'Fallido',
+  LANZADO: 'Lanzado' 
 }
 
 export const config = Object.assign(configEnv, envFile || {})
