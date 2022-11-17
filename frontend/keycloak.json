@@ -1,0 +1,14 @@
+{
+  "realm": "proyectocc",
+  "auth-server-url": "http://dev.int:8082/",
+  "ssl-required": "external",
+  "resource": "myAppClient",
+  "verify-token-audience": false,
+  "bearer-only": true,
+  "credentials": {
+    "secret": "pyF88tpdV6GNwp5PDLuq54Js2yYdGPxS"
+  },
+  "use-resource-role-mappings": true,
+  "confidential-port": 0,
+  "policy-enforcer": {}
+}

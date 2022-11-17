@@ -1,6 +1,13 @@
 # Proyecto Cloud Computing
 
 ## Frontend
+### /health
+#### GET /
+##### Response
+```
+response: <h1>Server is Running</h1>
+```
+
 ### /api
 #### POST /addJob
 ##### Request
@@ -34,28 +41,25 @@ response: {
             "outputFiles": ["url://file1", "url://file2"]
           }
 ```
-### /auth
-#### POST /getToken
+
+#### GET /results/{jobId}/{filename}
 ##### Request
 ```
-body: {
-        "username": "myUsername",
-        "password": "myPassword"
-      }
+headers:
+  Authorization: Bearer yourBearerToken
+```
+##### Response
+```
+response: File Download
 ```
 
+### /auth
+#### GET /{username}/{password}
 ##### Response
 ```
 response: {
             "token": "yourBearerToken"
           }
-```
-
-### /health
-#### GET /
-##### Response
-```
-response: <h1>Server is Running</h1>
 ```
 
 ## Job definition standard

@@ -40,6 +40,8 @@ export async function checkJobStatus(req: Request, res: Response) {
 
   if (!jobStatus) {
     res.send("Trabajo no encontrado. El id es incorrecto.")
+  } else if (jobStatus == config.FINALIZADO) {
+    res.send(JSON.stringify(jobs[req.params.id]))
   } else {
     res.send("El estado del trabajo es: " + jobStatus)
   }
@@ -54,9 +56,7 @@ function startStatusListener() {
       eachMessage: async ({ topic, partition, message }) => {
         try {
           const jobStatus: JobStatus = JSON.parse(message.value.toString());
-          console.log("jobs - prev", jobs);
           jobs[jobStatus.id] = jobStatus
-          console.log("jobs - post", jobs);
         } catch (err) {
           console.error(err);
           exit();

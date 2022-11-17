@@ -1,8 +1,10 @@
----
-version: '2'
+version: '3'
 volumes:
   minio:
     driver: local
+  postgres:
+    driver: local
+
 services:
   zookeeper:
     image: confluentinc/cp-zookeeper:latest
@@ -27,6 +29,7 @@ services:
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+
   kafka-ui:
     container_name: kafka-ui
     image: provectuslabs/kafka-ui:latest
@@ -49,14 +52,43 @@ services:
       - 9000:9000
       - 9090:9090
     environment:
-      - MINIO_ROOT_USER=admin
-      - MINIO_ROOT_PASSWORD=adminadmin
+      - MINIO_ROOT_USER=admin # MINIO_SERVER_ACCESS_KEY
+      - MINIO_ROOT_PASSWORD=adminadmin # MINIO_SERVER_SECRET_KEY
       - MINIO_SERVER_URL=http://dev.int:9000
-      - MINIO_SERVER_ACCESS_KEY=minio-access-key
-      - MINIO_SERVER_SECRET_KEY=minio-secret-key
     volumes:
       - minio:/data
     command: server /data --console-address ":9090"
+  
+  postgres:
+    image: postgres:15
+    restart: always
+    ports:
+      - 5433:5432
+    environment: 
+      - POSTGRES_DB=keycloak
+      - POSTGRES_PASSWORD=adminadmin
+      - PGDATA=/var/lib/postgresql/data/pgdata
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    #env_file:
+    #  - ./postgres.env
+    
+  keycloak:
+    image: quay.io/keycloak/keycloak:20.0
+    restart: always
+    depends_on:
+      - postgres
+    ports:
+      - 8082:8080
+    environment:
+      - KEYCLOAK_ADMIN=admin
+      - KEYCLOAK_ADMIN_PASSWORD=adminadmin
+      - KC_DB=postgres
+      - KC_DB_URL=jdbc:postgresql://postgres:5432/keycloak
+      - KC_DB_USERNAME=postgres
+      - KC_DB_PASSWORD=adminadmin
+      # - KC_HOSTNAME=dev.int
+    command: start-dev
 
   # worker:
   #   build: ./worker

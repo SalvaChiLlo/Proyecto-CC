@@ -1,9 +1,14 @@
 import { Router } from 'express'
+import getFile from '../service/fileService';
 import { addJob, checkJobStatus } from '../service/jobService';
+import { getKeycloak } from '../utils/keycloakConfig';
+import { Keycloak } from 'keycloak-connect';
 
 const jobRoutes = Router();
+const keycloak: Keycloak = getKeycloak();
 
-jobRoutes.get('/status/:id', checkJobStatus);
-jobRoutes.post('/addJob', addJob);
+jobRoutes.post('/addJob', keycloak.protect(), addJob);
+jobRoutes.get('/status/:id', keycloak.protect(), checkJobStatus);
+jobRoutes.get('/results/:id/:file', keycloak.protect(), getFile);
 
 export default jobRoutes;

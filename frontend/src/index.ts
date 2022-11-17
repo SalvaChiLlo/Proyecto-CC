@@ -1,13 +1,13 @@
 import http from 'http';
 import express from 'express';
-import { configExpress } from './config/express';
 import { config } from './config/environment/';
-import { initRoutes } from './routes';
 
-// Setup server
 export const app = express();
 const server = http.createServer(app);
+// Setup server
+import { configExpress } from './config/express';
 configExpress(app);
+import { initRoutes } from './routes';
 initRoutes(app);
 
 server.listen(config.port, config.ip, () => {
