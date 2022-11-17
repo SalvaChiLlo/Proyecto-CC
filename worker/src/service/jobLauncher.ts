@@ -2,7 +2,7 @@ import { Job } from "../models/jobModel";
 import { updateJobStatus } from "../utils/kafka";
 import executeJob from "./jobExecutor";
 
-export async function launchJob(job: Job, partition: number) {
+export async function launchJob(job: Job) {
   console.log(job);
   console.log("Lanzando Trabajo");
 

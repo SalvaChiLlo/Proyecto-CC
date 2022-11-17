@@ -3,6 +3,8 @@ import { config } from "../config/environment";
 import { Job, JobStatus } from "../models/jobModel";
 import { writeFile } from "../utils/files";
 import { updateJobStatus } from "../utils/kafka";
+import { minioClient } from "./minioService";
+import { readdirSync } from 'fs'
 
 export default async function executeJob(job: Job): Promise<JobStatus> {
   let jobStdout: string = "";
@@ -33,12 +35,22 @@ export default async function executeJob(job: Job): Promise<JobStatus> {
     jobStatus.status = config.FALLO
     console.error(jobStderr);
   } finally {
-    console.log("FINALLY")
     writeLogs(projectFolder, jobStdout, jobStderr);
 
     // Guardar ${projectFolder}/output/ en MINIO
+    const outputFolder = projectFolder + '/output/';
+    const outputFiles = readdirSync(outputFolder);
 
-    // const rm = execSync(`rm -rf ${projectFolder};`)
+    outputFiles.forEach(async file =>  {
+      try {
+        await minioClient.fPutObject(process.env.MINIO_BUCKET, job.id + '/' + file, outputFolder + file)
+        jobStatus.outputFiles = outputFiles;
+      } catch (err: any) {
+        throw new Error(err)
+      }
+    })
+
+    execSync(`rm -rf ${projectFolder};`)
 
     return jobStatus;
   }
