@@ -1,14 +1,24 @@
 import { Request, Response } from "express";
-import axios from 'axios';
+import axios, { AxiosError, AxiosResponse } from 'axios';
 import qs from "qs";
 import kcconfig from '../../keycloak.json'
 
 export default async function login(req: Request, res: Response) {
-  const response = await getToken(req.params.user, req.params.password);
-  res.send(response.data.access_token);
+  let message;
+  try {
+    const response = await getToken(req.params.user, req.params.password);
+    message = response.data?.access_token;
+  } catch (err: any) {
+    const axiosError: AxiosError = err;
+    const data: any = axiosError.response.data;
+    message = data.error_description;
+  }
+
+  res.send(message)
 }
 
-async function getToken(user: string, password: string) {
+function getToken(user: string, password: string): Promise<AxiosResponse> {
+
   const data = qs.stringify({
     grant_type: 'password',
     client_id: kcconfig.resource,
@@ -16,6 +26,7 @@ async function getToken(user: string, password: string) {
     username: user,
     password,
   });
+
 
   const config = {
     method: 'post',
