@@ -40,10 +40,8 @@ export async function checkJobStatus(req: Request, res: Response) {
 
   if (!jobStatus) {
     res.send("Trabajo no encontrado. El id es incorrecto.")
-  } else if (jobStatus == config.FINALIZADO) {
-    res.send(JSON.stringify(jobs[req.params.id]))
   } else {
-    res.send("El estado del trabajo es: " + jobStatus)
+    res.send(JSON.stringify(jobs[req.params.id]))
   }
 }
 

@@ -70,8 +70,6 @@ services:
       - PGDATA=/var/lib/postgresql/data/pgdata
     volumes:
       - postgres:/var/lib/postgresql/data
-    #env_file:
-    #  - ./postgres.env
     
   keycloak:
     image: quay.io/keycloak/keycloak:20.0
@@ -88,26 +86,42 @@ services:
       - KC_DB_USERNAME=postgres
       - KC_DB_PASSWORD=adminadmin
       # - KC_HOSTNAME=dev.int
-    command: start-dev
+    command: "start-dev"
 
-  # worker:
-  #   build: ./worker
-  #   depends_on:
-  #     - kafka
-  #   environment:
-  #     - NODE_ENV=production
-  #     - PRODUCTION_IP=0.0.0.0
-  #     - PRODUCTION_KAFKA_URL=kafka:9092
-  #     - WORKER_DATA_FOLDER=/tmp/jobexecutor/
+  worker:
+    image: salvachll/worker-proyectocc
+    # build: ./worker
+    depends_on:
+      - kafka
+    environment:
+      - NODE_ENV=production
+      - PRODUCTION_KAFKA_URL=kafka:9092
+      - WORKER_DATA_FOLDER=/tmp/jobexecutor
+      - MINIO_URL=minio
+      - MINIO_PORT=9000
+      - MINIO_BUCKET=proyecto-cc
+      - MINIO_ACCESS_KEY=admin
+      - MINIO_SECRET_KEY=adminadmin
+    volumes:
+      - ${HOME}/Downloads/pruebas:/tmp/jobexecutor
 
-  # frontend:
-  #   build: ./frontend
-  #   depends_on:
-  #     - kafka
-  #   environment:
-  #     - NODE_ENV=production
-  #     - PRODUCTION_PORT=9000
-  #     - PRODUCTION_IP=0.0.0.0
-  #     - PRODUCTION_KAFKA_URL=kafka:9092
-  #   ports:
-  #     - 80:9000
+  frontend:
+    image: salvachll/frontend-proyectocc
+    # build: ./frontend
+    depends_on:
+      - kafka
+    environment:
+      - NODE_ENV=production
+      - PRODUCTION_PORT=9000
+      - PRODUCTION_IP=0.0.0.0
+      - PRODUCTION_KAFKA_URL=kafka:9092
+      - FRONTEND_DATA_DIR=/tmp/frontend/
+      - MINIO_URL=minio
+      - MINIO_PORT=9000
+      - MINIO_BUCKET=proyecto-cc
+      - MINIO_ACCESS_KEY=admin
+      - MINIO_SECRET_KEY=adminadmin
+    volumes:
+      - ${PWD}/keycloak.json:/usr/src/app/build/app/keycloak.json
+    ports:
+      - 80:9000

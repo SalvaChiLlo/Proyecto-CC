@@ -3,6 +3,7 @@ import axios, { AxiosError, AxiosResponse } from 'axios';
 import qs from "qs";
 import kcconfig from '../../keycloak.json'
 
+
 export default async function login(req: Request, res: Response) {
   let message;
   try {
@@ -10,14 +11,16 @@ export default async function login(req: Request, res: Response) {
     message = response.data?.access_token;
   } catch (err: any) {
     const axiosError: AxiosError = err;
-    const data: any = axiosError.response.data;
-    message = data.error_description;
+    // const data: any = axiosError.response.data;
+    // message = data.error_description;
+    message = axiosError
   }
 
   res.send(message)
 }
 
 function getToken(user: string, password: string): Promise<AxiosResponse> {
+  console.log(kcconfig);
 
   const data = qs.stringify({
     grant_type: 'password',
@@ -26,7 +29,6 @@ function getToken(user: string, password: string): Promise<AxiosResponse> {
     username: user,
     password,
   });
-
 
   const config = {
     method: 'post',

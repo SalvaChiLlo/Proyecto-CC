@@ -18,7 +18,7 @@ export default async function executeJob(job: Job): Promise<JobStatus> {
   try {
     // Por prevención eliminamos la carpeta donde se va a crear el proyecto por si por algún casual esta ya existiese.
     execSync(`rm -rf ${projectFolder}`)
-    const clone = execSync(`mkdir -p ${config.WORKER_DATA_FOLDER}; cd ${config.WORKER_DATA_FOLDER}; pwd; git clone ${job.url} ${job.id};`);
+    const clone = execSync(`mkdir -p ${config.WORKER_DATA_FOLDER}; cd ${config.WORKER_DATA_FOLDER}; pwd; git clone ${job.url} ${projectFolder};`);
     jobStdout += clone;
     const cd = execSync(`cd ${projectFolder};`)
     jobStdout += cd;
@@ -41,6 +41,8 @@ export default async function executeJob(job: Job): Promise<JobStatus> {
     const outputFolder = projectFolder + '/output/';
     const outputFiles = readdirSync(outputFolder);
 
+    console.log(outputFiles);
+    jobStatus.outputFiles = outputFiles;
     outputFiles.forEach(async file =>  {
       try {
         await minioClient.fPutObject(process.env.MINIO_BUCKET, job.id + '/' + file, outputFolder + file)
@@ -49,9 +51,7 @@ export default async function executeJob(job: Job): Promise<JobStatus> {
         throw new Error(err)
       }
     })
-
-    execSync(`rm -rf ${projectFolder};`)
-
+ 
     return jobStatus;
   }
 

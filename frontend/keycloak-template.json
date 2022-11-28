@@ -1,12 +1,12 @@
 {
-  "realm": "realm-name",
-  "auth-server-url": "server-url",
+  "realm": "",
+  "auth-server-url": "",
   "ssl-required": "external",
-  "resource": "client-name",
-  "verify-token-audience": false, // This has to be false
-  "bearer-only": true, // Add this option so you can login via bearer token
+  "resource": "",
+  "verify-token-audience": false,
+  "bearer-only": true,
   "credentials": {
-    "secret": "client-credentials"
+    "secret": ""
   },
   "use-resource-role-mappings": true,
   "confidential-port": 0,
