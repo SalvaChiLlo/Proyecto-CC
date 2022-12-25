@@ -11,4 +11,5 @@ export interface JobStatus {
   id: string;
   status: string;
   outputFiles?: string[];
+  elapsedTime?: number;
 }

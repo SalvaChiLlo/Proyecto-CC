@@ -1,12 +1,13 @@
 import { Job, JobStatus } from "./models/jobModel"
-import { consumer, updateJobStatus } from './utils/kafka';
+import { consumer, getConsumer, updateJobStatus } from './utils/kafka';
 import { launchJob } from "./service/jobLauncher";
 import { config } from "./config/environment";
 
 const jobListener = async () => {
   // Consuming
-  await consumer.connect()
-  await consumer.subscribe({ topic: 'jobs-queue', fromBeginning: true })
+  const consumer = await getConsumer('jobs-queue');
+  console.log("FINALLY A CONSUMER WITH PARTITION");
+  
 
   await consumer.run({
     eachMessage: async ({ topic, partition, message }) => {

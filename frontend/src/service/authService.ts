@@ -20,8 +20,6 @@ export default async function login(req: Request, res: Response) {
 }
 
 function getToken(user: string, password: string): Promise<AxiosResponse> {
-  console.log(kcconfig);
-
   const data = qs.stringify({
     grant_type: 'password',
     client_id: kcconfig.resource,

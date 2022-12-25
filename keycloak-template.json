@@ -1,12 +1,12 @@
 {
-  "realm": "proyectocc",
-  "auth-server-url": "http://dev.int:8082/",
+  "realm": "",
+  "auth-server-url": "",
   "ssl-required": "external",
-  "resource": "prodClient",
-  "bearer-only": true,
+  "resource": "",
   "verify-token-audience": false,
+  "bearer-only": true,
   "credentials": {
-    "secret": "zNZXFMEBdiFhcJVSKDxgDfSXEnOevfjm"
+    "secret": ""
   },
   "use-resource-role-mappings": true,
   "confidential-port": 0,
