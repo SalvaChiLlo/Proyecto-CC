@@ -12,8 +12,8 @@ services:
     ports: 
       - 2181:2181
     environment:
-      ZOOKEEPER_CLIENT_PORT: 2181
-      ZOOKEEPER_TICK_TIME: 2000
+      ZOOKEEPER_CLIENT_PORT: ${ZOOKEEPER_CLIENT_PORT}
+      ZOOKEEPER_TICK_TIME: ${ZOOKEEPER_TICK_TIME}
 
   kafka:
     image: confluentinc/cp-kafka:latest
@@ -23,12 +23,12 @@ services:
     ports:
       - 29092:29092
     environment:
-      KAFKA_BROKER_ID: 1
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
-      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_BROKER_ID: ${KAFKA_BROKER_ID}
+      KAFKA_ZOOKEEPER_CONNECT: ${KAFKA_ZOOKEEPER_CONNECT}
+      KAFKA_ADVERTISED_LISTENERS: ${KAFKA_ADVERTISED_LISTENERS}
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: ${KAFKA_LISTENER_SECURITY_PROTOCOL_MAP}
+      KAFKA_INTER_BROKER_LISTENER_NAME: ${KAFKA_INTER_BROKER_LISTENER_NAME}
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: ${KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR}
 
   kafka-ui:
     container_name: kafka-ui
@@ -39,25 +39,27 @@ services:
       - zookeeper
       - kafka
     environment:
-      KAFKA_CLUSTERS_0_NAME: local
-      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
-      KAFKA_CLUSTERS_0_METRICS_PORT: 9997
+      KAFKA_CLUSTERS_0_NAME: ${KAFKA_CLUSTERS_0_NAME}
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: ${KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS}
+      KAFKA_CLUSTERS_0_METRICS_PORT: ${KAFKA_CLUSTERS_0_METRICS_PORT}
     labels:
       - project=cc
       
   minio:
-    image: minio/minio:RELEASE.2022-10-15T19-57-03Z
+    image: minio/minio:latest
     restart: always
     ports: 
       - 9000:9000
       - 9090:9090
     environment:
-      - MINIO_ROOT_USER=admin # MINIO_SERVER_ACCESS_KEY
-      - MINIO_ROOT_PASSWORD=adminadmin # MINIO_SERVER_SECRET_KEY
-      - MINIO_SERVER_URL=http://dev.int:9000
+      - MINIO_ROOT_USER=${MINIO_ROOT_USER} # MINIO_SERVER_ACCESS_KEY
+      - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD} # MINIO_SERVER_SECRET_KEY
+      - MINIO_SERVER_URL=${MINIO_SERVER_URL}
+      - MINIO_BUCKET=${MINIO_BUCKET}
     volumes:
       - minio:/data
-    command: server /data --console-address ":9090"
+    command: -c "mkdir -p /data/$$MINIO_BUCKET && minio server /data --console-address \":9090\""
+    entrypoint: "/bin/bash"
   
   postgres:
     image: postgres:15
@@ -65,9 +67,9 @@ services:
     ports:
       - 5433:5432
     environment: 
-      - POSTGRES_DB=keycloak
-      - POSTGRES_PASSWORD=adminadmin
-      - PGDATA=/var/lib/postgresql/data/pgdata
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - PGDATA=${PGDATA}
     volumes:
       - postgres:/var/lib/postgresql/data
     
@@ -79,12 +81,12 @@ services:
     ports:
       - 8082:8080
     environment:
-      - KEYCLOAK_ADMIN=admin
-      - KEYCLOAK_ADMIN_PASSWORD=adminadmin
-      - KC_DB=postgres
-      - KC_DB_URL=jdbc:postgresql://postgres:5432/keycloak
-      - KC_DB_USERNAME=postgres
-      - KC_DB_PASSWORD=adminadmin
+      - KEYCLOAK_ADMIN=${KEYCLOAK_ADMIN}
+      - KEYCLOAK_ADMIN_PASSWORD=${KEYCLOAK_ADMIN_PASSWORD}
+      - KC_DB=${KC_DB}
+      - KC_DB_URL=${KC_DB_URL}
+      - KC_DB_USERNAME=${KC_DB_USERNAME}
+      - KC_DB_PASSWORD=${KC_DB_PASSWORD}
       # - KC_HOSTNAME=dev.int
     command: "start-dev"
 
@@ -94,14 +96,14 @@ services:
     depends_on:
       - kafka
     environment:
-      - NODE_ENV=production
-      - PRODUCTION_KAFKA_URL=kafka:9092
-      - WORKER_DATA_FOLDER=/tmp/jobexecutor
-      - MINIO_URL=minio
-      - MINIO_PORT=9000
-      - MINIO_BUCKET=proyecto-cc
-      - MINIO_ACCESS_KEY=admin
-      - MINIO_SECRET_KEY=adminadmin
+      - NODE_ENV=${WORKER_NODE_ENV}
+      - PRODUCTION_KAFKA_URL=${KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS}
+      - WORKER_DATA_FOLDER=${WORKER_DATA_FOLDER}
+      - MINIO_URL=${MINIO_URL}
+      - MINIO_PORT=${MINIO_PORT}
+      - MINIO_BUCKET=${MINIO_BUCKET}
+      - MINIO_ACCESS_KEY=${MINIO_ROOT_USER}
+      - MINIO_SECRET_KEY=${MINIO_ROOT_PASSWORD}
     volumes:
       - ${HOME}/Downloads/pruebas:/tmp/jobexecutor
 
@@ -111,16 +113,16 @@ services:
     depends_on:
       - kafka
     environment:
-      - NODE_ENV=production
-      - PRODUCTION_PORT=9000
-      - PRODUCTION_IP=0.0.0.0
-      - PRODUCTION_KAFKA_URL=kafka:9092
-      - FRONTEND_DATA_DIR=/tmp/frontend/
-      - MINIO_URL=minio
-      - MINIO_PORT=9000
-      - MINIO_BUCKET=proyecto-cc
-      - MINIO_ACCESS_KEY=admin
-      - MINIO_SECRET_KEY=adminadmin
+      - NODE_ENV=${FRONTEND_NODE_ENV}
+      - PRODUCTION_PORT=${FRONTEND_PRODUCTION_PORT}
+      - PRODUCTION_IP=${FRONTEND_PRODUCTION_IP}
+      - PRODUCTION_KAFKA_URL=${KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS}
+      - FRONTEND_DATA_DIR=${FRONTEND_DATA_DIR}
+      - MINIO_URL=${MINIO_URL}
+      - MINIO_PORT=${MINIO_PORT}
+      - MINIO_BUCKET=${MINIO_BUCKET}
+      - MINIO_ACCESS_KEY=${MINIO_ROOT_USER}
+      - MINIO_SECRET_KEY=${MINIO_ROOT_PASSWORD}
     volumes:
       - ${PWD}/keycloak.json:/usr/src/app/build/app/keycloak.json
     ports:
