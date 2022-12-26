@@ -12,7 +12,11 @@ export default async function executeJob(job: Job): Promise<JobStatus> {
   const projectFolder = `${config.WORKER_DATA_FOLDER}/${job.id}`
   const jobStatus: JobStatus = {
     id: job.id,
-    status: config.LANZADO
+    status: config.LANZADO,
+    username: job.username,
+    url: job.url,
+    config: job.config,
+    args: job.args,
   }
   await updateJobStatus(jobStatus)
   try {

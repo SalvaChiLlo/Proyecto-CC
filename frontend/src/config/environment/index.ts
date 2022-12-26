@@ -11,7 +11,7 @@ const configEnv = {
   FINALIZADO: 'Finalizado',
   ESPERA: 'En espera',
   FALLO: 'Fallido',
-  LANZADO: 'Lanzado' 
+  LANZADO: 'Lanzado'
 }
 
 export const config = Object.assign(configEnv, envFile || {})

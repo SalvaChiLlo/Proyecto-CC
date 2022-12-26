@@ -1,11 +1,11 @@
 // import Endpoints
-import { Request, Response } from "express";
-import { Job, JobStatus } from "../models/jobModel";
+import { Request, Response } from 'express';
+import { Job, JobStatus } from '../models/jobModel';
 import { config } from '../config/environment/';
-import { consumer, producer } from "../utils/kafka";
-import { exit } from "process";
-
-const jobs: any = {};
+import { consumer, producer } from '../utils/kafka';
+import { exit } from 'process';
+import * as jwt from 'jsonwebtoken'
+import { addDocuments, getJobById, getJobsByUsername, updateJobById as updateJob } from './mongoService'
 
 export async function addJob(req: Request, res: Response) {
   try {
@@ -15,10 +15,19 @@ export async function addJob(req: Request, res: Response) {
       args: req.body.args,
       config: req.body.config,
       id: Date.now().toString(),
-      token: req.headers.authorization
+      username: getUsernameFromToken(req)
     };
 
-    jobs[newJob.id.toString()] = { id: newJob.id, status: config.ESPERA };
+    // INSERTAR ESTADO TRABAJO
+    const jobStatus: JobStatus = {
+      id: newJob.id,
+      status: config.ESPERA,
+      username: getUsernameFromToken(req),
+      url: newJob.url,
+      config: newJob.config,
+      args: newJob.args,
+    }
+    await addDocuments([jobStatus])
 
     const messages = [
       { value: JSON.stringify(newJob) }
@@ -36,13 +45,23 @@ export async function addJob(req: Request, res: Response) {
 }
 
 export async function checkJobStatus(req: Request, res: Response) {
-  const jobStatus: string = jobs[req.params.id]?.status;
 
-  if (!jobStatus) {
-    res.send("Trabajo no encontrado. El id es incorrecto.")
+  const jobStatus = await getJobById(req.params.id);
+
+  if (jobStatus.length === 0) {
+    res.send('Trabajo no encontrado. El id es incorrecto.')
   } else {
-    res.send(JSON.stringify(jobs[req.params.id]))
+    res.send(jobStatus[0])
   }
+}
+
+export async function showUserJobs(req: Request, res: Response) {
+  const token = req.headers.authorization.replace('Bearer ', '')
+
+  const tokenObject: jwt.JwtPayload = jwt.decode(token, { json: true })
+  const username: string = tokenObject.preferred_username;
+
+  res.send(await getJobsByUsername(username));
 }
 
 function startStatusListener() {
@@ -54,7 +73,20 @@ function startStatusListener() {
       eachMessage: async ({ topic, partition, message }) => {
         try {
           const jobStatus: JobStatus = JSON.parse(message.value.toString());
-          jobs[jobStatus.id] = jobStatus
+          console.log(`
+----------------------------------------------------------------
+----------------------------------------------------------------
+----------------------------------------------------------------
+
+              ${JSON.stringify(jobStatus)}
+
+----------------------------------------------------------------
+----------------------------------------------------------------
+----------------------------------------------------------------
+
+          `);
+          
+          updateJob(jobStatus)
         } catch (err) {
           console.error(err);
           exit();
@@ -66,3 +98,12 @@ function startStatusListener() {
 }
 startStatusListener();
 
+function getUsernameFromToken(req: Request): string {
+  try {
+    const token = req.headers.authorization.replace('Bearer ', '')
+    const tokenObject: jwt.JwtPayload = jwt.decode(token, { json: true })
+    return tokenObject.preferred_username;
+  } catch (error: any) {
+    throw new Error("Bearer token incorrecto.")
+  }
+}

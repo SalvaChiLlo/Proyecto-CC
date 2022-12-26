@@ -1,10 +1,10 @@
 export interface Job {
-  url: string;
   id: string;
+  url: string;
   args?: string;
   config?: string;
   outputFolder?: string;
-  token?: string;
+  username: string;
 }
 
 export interface JobStatus {
@@ -12,4 +12,8 @@ export interface JobStatus {
   status: string;
   outputFiles?: string[];
   elapsedTime?: number;
+  username: string;
+  url: string;
+  args?: string;
+  config?: string
 }

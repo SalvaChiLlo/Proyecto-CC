@@ -27,6 +27,29 @@ response: {
           }
 ```
 
+#### GET /status
+##### Request
+```
+headers:
+  Authorization: Bearer yourBearerToken
+```
+##### Response
+```
+response: [
+            {
+              "id": string,
+              "status": string,
+              "outputFiles": ["url://file1", "url://file2"]
+            },
+            {
+              "id": string,
+              "status": string,
+              "outputFiles": ["url://file1", "url://file2"]
+            },
+            ...
+          ]
+```
+
 #### GET /status/{jobId}
 ##### Request
 ```

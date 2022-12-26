@@ -1,14 +1,19 @@
 export interface Job {
-  url: string;
   id: string;
+  url: string;
   args?: string;
   config?: string;
   outputFolder?: string;
-  token: string;
+  username: string;
 }
 
 export interface JobStatus {
   id: string;
   status: string;
   outputFiles?: string[];
+  elapsedTime?: number;
+  username: string;
+  url: string;
+  args?: string;
+  config?: string
 }

@@ -17,7 +17,11 @@ const jobListener = async () => {
       } catch (err: any) {
         const jobStatus: JobStatus = {
           id: job.id,
-          status: config.FALLO
+          status: config.FALLO,
+          username: job.username,
+          url: job.url,
+          config: job.config,
+          args: job.args,
         }
         updateJobStatus(jobStatus);
         console.error(err)
