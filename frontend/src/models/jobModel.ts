@@ -17,3 +17,8 @@ export interface JobStatus {
   args?: string;
   config?: string
 }
+
+export interface IgnoreJob {
+  id: string;
+  username: string;
+}

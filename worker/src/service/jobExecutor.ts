@@ -1,10 +1,12 @@
 import { execSync } from "child_process";
 import { config } from "../config/environment";
-import { Job, JobStatus } from "../models/jobModel";
+import { IgnoreJob, Job, JobStatus } from "../models/jobModel";
 import { writeFile } from "../utils/files";
-import { updateJobStatus } from "../utils/kafka";
+import { consumer, getConsumerDeletedJobs, updateJobStatus } from "../utils/kafka";
 import { minioClient } from "./minioService";
 import { readdirSync } from 'fs'
+
+const jobsToIgnore: IgnoreJob[] = [];
 
 export default async function executeJob(job: Job): Promise<JobStatus> {
   let jobStdout: string = "";
@@ -17,6 +19,10 @@ export default async function executeJob(job: Job): Promise<JobStatus> {
     url: job.url,
     config: job.config,
     args: job.args,
+  }
+  if (checkIfJobIsDeleted(job)) {
+    jobStatus.status = "Eliminado"
+    return jobStatus
   }
   await updateJobStatus(jobStatus)
   try {
@@ -70,3 +76,19 @@ function writeLogs(projectFolder: string, jobStdout: string, jobStderr: string) 
     throw new Error(err)
   }
 }
+
+function checkIfJobIsDeleted(job: Job): boolean {
+  return jobsToIgnore.filter(ignoredJob => ignoredJob.id === job.id && ignoredJob.username === job.username).length !== 0
+}
+
+async function deletedJobsListener() {
+  (await getConsumerDeletedJobs()).run({
+    eachMessage: async ({ topic, partition, message }) => {
+      const ignoreJob: IgnoreJob = JSON.parse(message.value.toString());
+  
+      jobsToIgnore.push(ignoreJob);
+    },
+  })
+
+}
+deletedJobsListener()

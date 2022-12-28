@@ -1,6 +1,6 @@
 // import Endpoints
 import { Request, Response } from 'express';
-import { Job, JobStatus } from '../models/jobModel';
+import { IgnoreJob, Job, JobStatus } from '../models/jobModel';
 import { config } from '../config/environment/';
 import { consumer, producer } from '../utils/kafka';
 import { exit } from 'process';
@@ -39,6 +39,7 @@ export async function addJob(req: Request, res: Response) {
       messages
     });
     res.send(`El id de tu trabajo es: ${newJob.id}`);
+    await producer.disconnect();
   } catch (err) {
     console.error(err);
   }
@@ -107,3 +108,30 @@ function getUsernameFromToken(req: Request): string {
     throw new Error("Bearer token incorrecto.")
   }
 }
+
+export async function deleteJob(req: Request, res: Response) {  
+  try {
+    const jobId = req.params.id;
+    await producer.connect();
+
+    const deletionRequest: IgnoreJob = {
+      id: jobId,
+      username: getUsernameFromToken(req)
+    }
+
+    const messages = [
+      { value: JSON.stringify(deletionRequest) }
+    ]
+    console.log(messages);
+
+    await producer.send({
+      topic: 'ignore-jobs',
+      messages
+    });
+
+    res.send(`El trabajo ${jobId} ha sido eliminado.`);
+    await producer.disconnect();
+  } catch (err) {
+    console.error(err);
+  }
+} 

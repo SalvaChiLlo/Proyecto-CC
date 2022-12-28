@@ -12,6 +12,14 @@ kafka.logger().setLogLevel(logLevel.ERROR)
 
 export let producer: Producer = kafka.producer({ createPartitioner: Partitioners.LegacyPartitioner })
 export let consumer: Consumer
+let consumerDeletedJobs: Consumer
+
+export async function getConsumerDeletedJobs(): Promise<Consumer> {
+  consumerDeletedJobs = kafka.consumer({ groupId: `${Math.random() * 10000}` })
+  await consumerDeletedJobs.connect();
+  await consumerDeletedJobs.subscribe({ topic: 'ignore-jobs', fromBeginning: true });
+  return consumerDeletedJobs;
+}
 
 export async function getConsumer(topic: string): Promise<Consumer> {
   consumer = kafka.consumer({ groupId: 'worker-group' })
