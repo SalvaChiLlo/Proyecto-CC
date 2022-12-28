@@ -12,6 +12,9 @@ export interface JobStatus {
   status: string;
   outputFiles?: string[];
   elapsedTime?: number;
+  arrivalTime?: string;
+  serviceTime?: string;
+  responseTime?: string;
   username: string;
   url: string;
   args?: string;

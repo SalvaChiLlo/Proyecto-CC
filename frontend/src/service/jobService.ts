@@ -2,14 +2,13 @@
 import { Request, Response } from 'express';
 import { IgnoreJob, Job, JobStatus } from '../models/jobModel';
 import { config } from '../config/environment/';
-import { consumer, producer } from '../utils/kafka';
+import { addJobStatus, consumer, producer } from '../utils/kafka';
 import { exit } from 'process';
 import * as jwt from 'jsonwebtoken'
 import { addDocuments, getJobById, getJobsByUsername, updateJobById as updateJob } from './mongoService'
 
 export async function addJob(req: Request, res: Response) {
   try {
-    await producer.connect();
     const newJob: Job = {
       url: req.body.url,
       args: req.body.args,
@@ -26,20 +25,22 @@ export async function addJob(req: Request, res: Response) {
       url: newJob.url,
       config: newJob.config,
       args: newJob.args,
+      arrivalTime: newJob.id
     }
+    await addJobStatus(jobStatus)
     await addDocuments([jobStatus])
-
+    
     const messages = [
       { value: JSON.stringify(newJob) }
     ]
     console.log(messages);
-
+    await producer.connect();
     await producer.send({
       topic: 'jobs-queue',
       messages
     });
     res.send(`El id de tu trabajo es: ${newJob.id}`);
-    await producer.disconnect();
+    
   } catch (err) {
     console.error(err);
   }

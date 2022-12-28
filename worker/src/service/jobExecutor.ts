@@ -16,6 +16,7 @@ export default async function executeJob(job: Job): Promise<JobStatus> {
     id: job.id,
     status: config.LANZADO,
     username: job.username,
+    serviceTime: Date.now().toString(),
     url: job.url,
     config: job.config,
     args: job.args,
@@ -62,6 +63,7 @@ export default async function executeJob(job: Job): Promise<JobStatus> {
       }
     })
  
+    jobStatus.responseTime = Date.now().toString();
     return jobStatus;
   }
 
