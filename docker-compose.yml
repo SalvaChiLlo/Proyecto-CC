@@ -125,6 +125,7 @@ services:
       - MINIO_BUCKET=${MINIO_BUCKET}
       - MINIO_ACCESS_KEY=${MINIO_ROOT_USER}
       - MINIO_SECRET_KEY=${MINIO_ROOT_PASSWORD}
+      - PARTITION_FACTOR=${PARTITION_FACTOR}
     volumes:
       - ${HOME}/Downloads/pruebas:/tmp/jobexecutor
 
@@ -150,3 +151,13 @@ services:
       - ${PWD}/keycloak.json:/usr/src/app/build/app/keycloak.json
     ports:
       - 80:9000
+
+  observer:
+    image: salvachll/salvachll/observer-proyectocc
+    # build: ./observer
+    environment:
+      - NODE_ENV=${OBSERVER_NODE_ENV}
+      - PRODUCTION_KAFKA_URL=${KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS}
+      - REFRESH_RATE=${REFRESH_RATE}
+    
+  

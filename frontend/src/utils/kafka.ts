@@ -11,6 +11,7 @@ kafka.logger().setLogLevel(logLevel.ERROR)
 
 export const producer: Producer = kafka.producer({ createPartitioner: Partitioners.LegacyPartitioner })
 export const consumer: Consumer = kafka.consumer({ groupId: 'frontend-group' })
+export const consumerLoad: Consumer = kafka.consumer({ groupId: 'frontend-load-group' })
 
 export async function addJobStatus(jobsStatus: JobStatus) {
   try {

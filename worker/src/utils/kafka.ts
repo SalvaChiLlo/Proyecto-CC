@@ -36,7 +36,7 @@ export async function getConsumer(topic: string): Promise<Consumer> {
   if (consumersCount > numOfPartitions) {
     console.log("HAY QUE CREAR NUEVAS PARTICIONES");
     try {
-      await kafka.admin().createPartitions({ topicPartitions: [{ topic: 'jobs-queue', count: consumersCount }] })
+      await kafka.admin().createPartitions({ topicPartitions: [{ topic: 'jobs-queue', count: consumersCount * config.PARTITION_FACTOR }] })
     } catch (err: any) { }
   }
 

@@ -7,6 +7,29 @@
 ```
 response: <h1>Server is Running</h1>
 ```
+#### GET /load
+Devuelve la carga del sistema durante los últimos 10 periodos (20 segundos). Lista ordenada en orden inverso según timestamp
+* avgRateOfArrival -> Devuelve la cantidad de trabajos que se han añadido en el periodo.
+* avgRateOfService -> Devuelve la cantidad de trabajos que han pasado de estado *En espera* a *Lanzado*
+* avgRateOfFinished -> Devuelve la cantidad de trabajos que han pasado a estado *Finalizado*
+* avgResponseTime --> Devuelve el tiempo medio de los trabajos terminados en el periodo.
+##### Request
+```
+headers:
+  Authorization: Bearer yourBearerToken
+##### Response
+```
+response: [
+            {
+              "avgRateOfArrival": number,
+              "avgRateOfService": number,
+              "avgRateOfFinished": number,
+              "avgResponseTime": number,
+              "timestamp": number
+            },
+            ...
+          ]
+```
 
 ### /api
 #### POST /addJob

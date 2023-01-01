@@ -25,3 +25,10 @@ export interface IgnoreJob {
   id: string;
   username: string;
 }
+
+export interface Observation {
+  avgRateOfArrival: number;
+  avgRateOfService: number;
+  avgResponseTime: number;
+  timestamp: number;
+}

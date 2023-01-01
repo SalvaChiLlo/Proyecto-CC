@@ -12,7 +12,7 @@ const configEnv = {
   ESPERA: 'En espera',
   FALLO: 'Fallido',
   LANZADO: 'Lanzado',
-  WORKER_DATA_FOLDER: process.env.WORKER_DATA_FOLDER
+  REFRESH_RATE: +process.env.REFRESH_RATE * 1000
 }
 
 export const config = Object.assign(configEnv, envFile || {})

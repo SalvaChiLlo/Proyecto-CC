@@ -18,7 +18,6 @@ const jobListener = async () => {
 }
 jobListener().catch(console.error)
 
-const smallInterval = 20000;
 setInterval(() => {
   let avgRateOfArrival: number[] = [];
   let avgRateOfService: number[] = [];
@@ -39,7 +38,9 @@ setInterval(() => {
   const observation: Observation = {
     avgRateOfArrival: avgRateOfArrival.length,
     avgRateOfService: avgRateOfService.length,
-    avgResponseTime: average(avgResponseTime)
+    avgRateOfFinished: avgResponseTime.length,
+    avgResponseTime: average(avgResponseTime),
+    timestamp: Date.now()
   }
   console.log({ observation });
 
@@ -48,7 +49,7 @@ setInterval(() => {
   newObservation(observation)
 
   jobsStatus = [];
-}, smallInterval)
+}, config.REFRESH_RATE)
 
 // const bigInterval = 60000;
 // setInterval(() => {

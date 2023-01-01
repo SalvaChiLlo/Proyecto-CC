@@ -29,5 +29,7 @@ export interface IgnoreJob {
 export interface Observation {
   avgRateOfArrival: number;
   avgRateOfService: number;
+  avgRateOfFinished: number;
   avgResponseTime: number;
+  timestamp: number;
 }

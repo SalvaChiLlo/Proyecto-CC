@@ -54,7 +54,7 @@ export default async function executeJob(job: Job): Promise<JobStatus> {
 
     console.log(outputFiles);
     jobStatus.outputFiles = outputFiles;
-    outputFiles.forEach(async file =>  {
+    outputFiles.forEach(async file => {
       try {
         await minioClient.fPutObject(process.env.MINIO_BUCKET, job.id + '/' + file, outputFolder + file)
         jobStatus.outputFiles = outputFiles;
@@ -62,8 +62,11 @@ export default async function executeJob(job: Job): Promise<JobStatus> {
         throw new Error(err)
       }
     })
- 
+
     jobStatus.responseTime = Date.now().toString();
+    try {
+      execSync(`rm -rf ${projectFolder}`)
+    } catch (err: any) { }
     return jobStatus;
   }
 
@@ -87,7 +90,7 @@ async function deletedJobsListener() {
   (await getConsumerDeletedJobs()).run({
     eachMessage: async ({ topic, partition, message }) => {
       const ignoreJob: IgnoreJob = JSON.parse(message.value.toString());
-  
+
       jobsToIgnore.push(ignoreJob);
     },
   })
