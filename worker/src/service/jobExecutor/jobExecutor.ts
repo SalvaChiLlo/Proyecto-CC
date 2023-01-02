@@ -1,10 +1,10 @@
 import { execSync } from "child_process";
-import { config } from "../config/environment";
-import { IgnoreJob, Job, JobStatus } from "../models/jobModel";
-import { writeFile } from "../utils/files";
-import { consumer, getConsumerDeletedJobs, updateJobStatus } from "../utils/kafka";
-import { minioClient } from "./minioService";
-import { readdirSync } from 'fs'
+import { readdirSync } from 'fs';
+import { config } from "../../config/environment";
+import { IgnoreJob, Job, JobStatus } from "../../models/jobModel";
+import { writeFile } from "../../utils/files/files";
+import { getConsumerDeletedJobs, updateJobStatus } from "../../utils/kafka/kafka";
+import { minioClient } from "../../utils/minio/minio";
 
 const jobsToIgnore: IgnoreJob[] = [];
 
@@ -54,14 +54,19 @@ export default async function executeJob(job: Job): Promise<JobStatus> {
 
     console.log(outputFiles);
     jobStatus.outputFiles = outputFiles;
-    outputFiles.forEach(async file => {
-      try {
-        await minioClient.fPutObject(process.env.MINIO_BUCKET, job.id + '/' + file, outputFolder + file)
-        jobStatus.outputFiles = outputFiles;
-      } catch (err: any) {
-        throw new Error(err)
-      }
-    })
+
+    await (new Promise((resolve, reject) => {
+      outputFiles.forEach(async (file, index, array) => {
+        try {
+          await minioClient.fPutObject(process.env.MINIO_BUCKET, job.id + '/' + file, outputFolder + file)
+          jobStatus.outputFiles = outputFiles;
+        } catch (err: any) {
+          throw new Error(err)
+        } finally {
+          if (index === array.length - 1) resolve(0);
+        }
+      })
+    }))
 
     jobStatus.responseTime = Date.now().toString();
     try {

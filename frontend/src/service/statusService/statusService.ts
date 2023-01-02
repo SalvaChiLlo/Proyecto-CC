@@ -1,15 +1,14 @@
-import { Request, Response } from "express";
-import { consumerLoad } from "../utils/kafka";
-import { Observation } from "../models/jobModel";
+import { Observation } from "../../models/jobModel";
+import { consumerLoad } from "../../utils/kafka/kafka";
 
 const observations: Observation[] = [];
 
-export default function checkServerStatus(req: Request, res: Response) {
-  res.status(200).send('<h1>Server is running</h1>');
+export function checkServerStatus(): any {
+  return '<h1>Server is running</h1>';
 }
 
-export function getLoad(req: Request, res: Response) {
-  res.send(observations.slice(0, 10))
+export function getLoad(): Observation[] {
+  return observations.slice(0, 10);
 }
 
 function startLoadListener() {

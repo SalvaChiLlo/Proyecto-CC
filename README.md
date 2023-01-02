@@ -17,6 +17,7 @@ Devuelve la carga del sistema durante los últimos 10 periodos (20 segundos). Li
 ```
 headers:
   Authorization: Bearer yourBearerToken
+```
 ##### Response
 ```
 response: [

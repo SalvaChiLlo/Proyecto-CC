@@ -1,6 +1,6 @@
-import { JobStatus, Observation } from "./models/jobModel"
-import { getConsumer, newObservation } from './utils/kafka';
 import { config } from "./config/environment";
+import { JobStatus, Observation } from "./models/jobModel";
+import { getConsumer, newObservation } from './utils/kafka/kafka';
 
 let jobsStatus: JobStatus[] = [];
 let observations: Observation[] = [];

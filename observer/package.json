@@ -1,5 +1,5 @@
 {
-  "name": "sequelize",
+  "name": "observer",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -11,7 +11,7 @@
     "seed": "node seeder.js",
     "update-db": "node dbUpdater.js",
     "build": "tsc",
-    "test": "mocha -r ts-node/register 'test/**/*.spec.ts'"
+    "test": "mocha -r ts-node/register 'src/**/*.spec.ts' --exit"
   },
   "keywords": [],
   "author": "",

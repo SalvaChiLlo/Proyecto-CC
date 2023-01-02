@@ -1,9 +1,9 @@
 import { performance } from "perf_hooks";
-import { Job } from "../models/jobModel";
-import { updateJobStatus } from "../utils/kafka";
-import executeJob from "./jobExecutor";
+import { Job, JobStatus } from "../../models/jobModel";
+import { updateJobStatus } from "../../utils/kafka/kafka";
+import executeJob from "../jobExecutor/jobExecutor";
 
-export async function launchJob(job: Job) {  
+export async function launchJob(job: Job): Promise<JobStatus> {  
   console.log(job);
   console.log("Lanzando Trabajo");
   
@@ -19,4 +19,5 @@ export async function launchJob(job: Job) {
   // SEND RESULTS
   console.log("Trabajo Terminado")
   updateJobStatus(status)
+  return status
 }

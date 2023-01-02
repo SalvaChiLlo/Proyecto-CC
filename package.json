@@ -1,0 +1,23 @@
+{
+  "name": "proyecto-cc",
+  "version": "1.0.0",
+  "description": "```\r response: <h1>Server is Running</h1>\r ```\r #### GET /load\r Devuelve la carga del sistema durante los últimos 10 periodos (20 segundos). Lista ordenada en orden inverso según timestamp\r * avgRateOfArrival -> Devuelve la cantidad de trabajos que se han añadido en el periodo.\r * avgRateOfService -> Devuelve la cantidad de trabajos que han pasado de estado *En espera* a *Lanzado*\r * avgRateOfFinished -> Devuelve la cantidad de trabajos que han pasado a estado *Finalizado*\r * avgResponseTime --> Devuelve el tiempo medio de los trabajos terminados en el periodo.\r ##### Request\r ```\r headers:\r   Authorization: Bearer yourBearerToken\r ```\r ##### Response\r ```\r response: [\r             {\r               \"avgRateOfArrival\": number,\r               \"avgRateOfService\": number,\r               \"avgRateOfFinished\": number,\r               \"avgResponseTime\": number,\r               \"timestamp\": number\r             },\r             ...\r           ]\r ```",
+  "main": "index.js",
+  "scripts": {
+    "test": "npm run testFrontend && npm run testObserver && npm run testWorker",
+    "testFrontend": "cd frontend && npm run test",
+    "testObserver": "cd observer && npm run test",
+    "testWorker": "cd worker && npm run test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SalvaChiLlo/Proyecto-CC.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/SalvaChiLlo/Proyecto-CC/issues"
+  },
+  "homepage": "https://github.com/SalvaChiLlo/Proyecto-CC#readme"
+}

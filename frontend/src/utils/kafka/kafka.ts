@@ -1,6 +1,6 @@
 import { Consumer, Kafka, Partitioners, Producer, logLevel } from "kafkajs";
-import { config } from "../config/environment";
-import { JobStatus } from "../models/jobModel";
+import { config } from "../../config/environment";
+import { JobStatus } from "../../models/jobModel";
 
 const kafka = new Kafka({
   clientId: 'frontend' + Date.now() * Math.random(),

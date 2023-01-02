@@ -1,6 +1,6 @@
 import { Job, JobStatus } from "./models/jobModel"
-import { consumer, getConsumer, updateJobStatus } from './utils/kafka';
-import { launchJob } from "./service/jobLauncher";
+import { consumer, getConsumer, updateJobStatus } from './utils/kafka/kafka';
+import { launchJob } from "./service/jobLauncher/jobLauncher";
 import { config } from "./config/environment";
 
 const jobListener = async () => {

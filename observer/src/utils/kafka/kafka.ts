@@ -1,7 +1,6 @@
-import { Consumer, ConsumerGroupJoinEvent, Kafka, Partitioners, Producer, logLevel } from "kafkajs"
-import { config } from "../config/environment"
-import { JobStatus, Observation } from "../models/jobModel"
-import { removeListener } from "process"
+import { Consumer, Kafka, Partitioners, Producer, logLevel } from "kafkajs"
+import { config } from "../../config/environment"
+import { Observation } from "../../models/jobModel"
 
 export const kafka = new Kafka({
   clientId: 'worker',

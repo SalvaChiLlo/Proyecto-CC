@@ -1,9 +1,11 @@
-import { Collection, Document, MongoClient, WithId } from 'mongodb'
-import { config } from '../config/environment/';
-import { Job, JobStatus } from '../models/jobModel';
+import { Collection, Document, MongoClient, WithId } from 'mongodb';
+import { config } from '../../config/environment';
+import { JobStatus } from '../../models/jobModel';
 
 // Connection URL
 const url = `mongodb://${config.mongoUser}:${config.mongoPassword}@${config.monogHost}`
+console.log(url);
+
 let client: MongoClient
 let collection: Collection<Document>;
 
@@ -28,9 +30,8 @@ export async function getJobsByUsername(username: string): Promise<JobStatus[]> 
   return documentToObjectStatus(await collection.find({ username }).toArray());
 }
 
-export async function getJobById(jobId: string): Promise<JobStatus[]> {
-  return documentToObjectStatus(await collection.find({ id: jobId }).toArray());
-
+export async function getJobByIdAndUsername(jobId: string, username: string): Promise<JobStatus[]> {
+  return documentToObjectStatus(await collection.find({ id: jobId, username }).toArray());
 }
 
 export async function updateJobById(jobStatus: JobStatus) {

@@ -112,8 +112,8 @@ services:
       ME_CONFIG_MONGODB_URL: mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@mongo:27017/
 
   worker:
-    image: salvachll/worker-proyectocc
-    # build: ./worker
+    # image: salvachll/worker-proyectocc
+    build: ./worker
     depends_on:
       - kafka
     environment:
@@ -130,8 +130,8 @@ services:
       - ${HOME}/Downloads/pruebas:/tmp/jobexecutor
 
   frontend:
-    image: salvachll/frontend-proyectocc
-    # build: ./frontend
+    # image: salvachll/frontend-proyectocc
+    build: ./frontend
     depends_on:
       - kafka
     environment:
@@ -139,7 +139,6 @@ services:
       - PRODUCTION_PORT=${FRONTEND_PRODUCTION_PORT}
       - PRODUCTION_IP=${FRONTEND_PRODUCTION_IP}
       - PRODUCTION_KAFKA_URL=${KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS}
-      - FRONTEND_DATA_DIR=${FRONTEND_DATA_DIR}
       - MINIO_URL=${MINIO_URL}
       - MINIO_PORT=${MINIO_PORT}
       - MINIO_BUCKET=${MINIO_BUCKET}
@@ -147,14 +146,16 @@ services:
       - MINIO_SECRET_KEY=${MINIO_ROOT_PASSWORD}
       - MONGO_DATABASE=${MONGO_DATABASE}
       - MONGO_HOST=${MONGO_HOST}
+      - MONGO_USERNAME=${MONGO_USERNAME}
+      - MONGO_PASSWORD=${MONGO_PASSWORD}
     volumes:
       - ${PWD}/keycloak.json:/usr/src/app/build/app/keycloak.json
     ports:
       - 80:9000
 
   observer:
-    image: salvachll/salvachll/observer-proyectocc
-    # build: ./observer
+    # image: salvachll/observer-proyectocc
+    build: ./observer
     environment:
       - NODE_ENV=${OBSERVER_NODE_ENV}
       - PRODUCTION_KAFKA_URL=${KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS}
