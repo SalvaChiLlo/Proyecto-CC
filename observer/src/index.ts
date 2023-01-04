@@ -1,6 +1,6 @@
 import { config } from "./config/environment";
 import { JobStatus, Observation } from "./models/jobModel";
-import { getConsumer, newObservation } from './utils/kafka/kafka';
+import { getConsumer, kafka, newObservation } from './utils/kafka/kafka';
 
 let jobsStatus: JobStatus[] = [];
 let observations: Observation[] = [];
@@ -18,7 +18,7 @@ const jobListener = async () => {
 }
 jobListener().catch(console.error)
 
-setInterval(() => {
+setInterval(async () => {
   let avgRateOfArrival: number[] = [];
   let avgRateOfService: number[] = [];
   let avgResponseTime: number[] = [];
@@ -47,32 +47,25 @@ setInterval(() => {
 
   observations.push(observation)
   newObservation(observation)
+  await elasticityStrategy(observation);
 
   jobsStatus = [];
 }, config.REFRESH_RATE)
 
-// const bigInterval = 60000;
-// setInterval(() => {
-//   const avgRateOfArrival: number[] = [];
-//   const avgRateOfService: number[] = [];
-//   const avgResponseTime: number[] = [];
+async function elasticityStrategy(observation: Observation) {
+  const pendienteLanzar = observation.avgRateOfArrival - observation.avgRateOfService
+  const numWorkers = (await kafka.admin().describeGroups(['worker-group'])).groups[0].members.length
+  
+  console.log({pendienteLanzar, numWorkers});
+  
+  if (pendienteLanzar > numWorkers) {
+    console.log(`Create ${pendienteLanzar} new Workers`)
+  }
 
-//   observations.forEach(obs => {
-//     avgRateOfArrival.push(obs.avgRateOfArrival);
-//     avgRateOfService.push(obs.avgRateOfService);
-//     avgResponseTime.push(obs.avgResponseTime);
-//   })
-
-//   const observation: Observation = {
-//     avgRateOfArrival: average(avgRateOfArrival),
-//     avgRateOfService: average(avgRateOfService),
-//     avgResponseTime: average(avgResponseTime)
-//   }
-
-//   newObservation(observation)
-
-// }, bigInterval)
-
+  if (numWorkers > 1 && (numWorkers-pendienteLanzar) > 0) {
+    console.log(`Delete ${numWorkers-pendienteLanzar} Workers`)
+  }
+}
 
 function average(numbers: number[]): number {
   const tmp = numbers.reduce((acc, curr) => acc += curr, 0)

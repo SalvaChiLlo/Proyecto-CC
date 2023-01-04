@@ -4,17 +4,18 @@ import { JobStatus } from '../../models/jobModel';
 
 // Connection URL
 const url = `mongodb://${config.mongoUser}:${config.mongoPassword}@${config.monogHost}`
-console.log(url);
 
 let client: MongoClient
 let collection: Collection<Document>;
 
 
 (async function main() {
+  if (client !== undefined) return;
+  
+  console.log(url)
   client = new MongoClient(url);
   await client.connect();
 
-  console.log(url)
   console.log('Connected successfully to server');
 
   const db = client.db(config.mongoDbName);

@@ -16,6 +16,12 @@ export function initKeycloak(app: Express): KeyCloak.Keycloak {
     store: memoryStore,
   }));
   keycloak = new KeyCloak({ store: memoryStore });
+
+  app.use(keycloak.middleware({
+    admin: '/',
+    logout: '/logout',
+  }));
+
   return keycloak;
 }
 

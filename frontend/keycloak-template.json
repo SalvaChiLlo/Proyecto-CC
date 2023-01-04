@@ -1,14 +1,9 @@
 {
-  "realm": "",
-  "auth-server-url": "",
-  "ssl-required": "external",
-  "resource": "",
-  "verify-token-audience": false,
+  "resource": "CLIENT",
+  "realm": "REALM",
+  "auth-server-url": "URL",
   "bearer-only": true,
   "credentials": {
-    "secret": ""
-  },
-  "use-resource-role-mappings": true,
-  "confidential-port": 0,
-  "policy-enforcer": {}
+    "secret": "SECRET"
+  }
 }

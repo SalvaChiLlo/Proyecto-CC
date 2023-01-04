@@ -2,7 +2,7 @@ import cors from 'cors';
 import express, { Express } from 'express';
 import compression from 'compression';
 import methodOverride from 'method-override';
-import { initKeycloak } from '../utils/keycloak/keycloakConfig';
+import { initKeycloak } from '../utils/keycloak/keycloak';
 
 export async function configExpress(app: Express) {
   app.use(compression());
@@ -11,9 +11,5 @@ export async function configExpress(app: Express) {
   app.use(methodOverride());
   app.use(cors({}));
 
-  const keycloak = await initKeycloak(app);
-  app.use(keycloak.middleware({
-    admin: '/admin',
-    logout: '/logout',
-  }));
+  await initKeycloak(app);
 };

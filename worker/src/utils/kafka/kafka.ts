@@ -32,11 +32,13 @@ export async function getConsumer(topic: string): Promise<Consumer> {
   }
   console.log({ consumersCount, numOfPartitions });
 
-  if (consumersCount > numOfPartitions) {
+  if (consumersCount * config.PARTITION_FACTOR > numOfPartitions) {
     console.log("HAY QUE CREAR NUEVAS PARTICIONES");
     try {
       await kafka.admin().createPartitions({ topicPartitions: [{ topic: 'jobs-queue', count: consumersCount * config.PARTITION_FACTOR }] })
-    } catch (err: any) { }
+    } catch (err: any) { 
+      console.error(err)
+    }
   }
 
   await consumer.connect();

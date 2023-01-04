@@ -1,7 +1,7 @@
 import { Router } from 'express'
 import { getFile } from '../service/fileService/fileService';
 import { addJob, checkJobStatus, deleteJob, showUserJobs } from '../service/jobService/jobService';
-import { getKeycloak } from '../utils/keycloak/keycloakConfig';
+import { getKeycloak } from '../utils/keycloak/keycloak';
 import { Keycloak } from 'keycloak-connect';
 import { lookup } from 'mime-types';
 

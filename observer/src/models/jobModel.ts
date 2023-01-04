@@ -3,7 +3,6 @@ export interface Job {
   url: string;
   args?: string;
   config?: string;
-  outputFolder?: string;
   username: string;
 }
 

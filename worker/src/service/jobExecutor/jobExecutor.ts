@@ -12,6 +12,7 @@ export default async function executeJob(job: Job): Promise<JobStatus> {
   let jobStdout: string = "";
   let jobStderr: string = "";
   const projectFolder = `${config.WORKER_DATA_FOLDER}/${job.id}`
+  const tempProjectFolder = `/tmp/std/${job.id}`
   const jobStatus: JobStatus = {
     id: job.id,
     status: config.LANZADO,
@@ -29,13 +30,15 @@ export default async function executeJob(job: Job): Promise<JobStatus> {
   try {
     // Por prevención eliminamos la carpeta donde se va a crear el proyecto por si por algún casual esta ya existiese.
     execSync(`rm -rf ${projectFolder}`)
+    execSync(`rm -rf ${tempProjectFolder}`)
+    execSync(`mkdir -p ${tempProjectFolder}/output`)
     const clone = execSync(`mkdir -p ${config.WORKER_DATA_FOLDER}; cd ${config.WORKER_DATA_FOLDER}; pwd; git clone ${job.url} ${projectFolder};`);
     jobStdout += clone;
     const cd = execSync(`cd ${projectFolder};`)
     jobStdout += cd;
     const mkdirOutput = execSync(`mkdir ${projectFolder}/output`)
     jobStdout += mkdirOutput;
-    writeFile(`${projectFolder}/config.json`, job.config.toString());
+    writeFile(`${projectFolder}/config.json`, job.config?.toString());
 
     const result = execSync(`cd ${projectFolder} && npm run start -- ${job.args}`)
     jobStdout += result;
@@ -46,35 +49,47 @@ export default async function executeJob(job: Job): Promise<JobStatus> {
     jobStatus.status = config.FALLO
     console.error(jobStderr);
   } finally {
-    writeLogs(projectFolder, jobStdout, jobStderr);
-
-    // Guardar ${projectFolder}/output/ en MINIO
-    const outputFolder = projectFolder + '/output/';
-    const outputFiles = readdirSync(outputFolder);
-
-    console.log(outputFiles);
-    jobStatus.outputFiles = outputFiles;
-
-    await (new Promise((resolve, reject) => {
-      outputFiles.forEach(async (file, index, array) => {
-        try {
-          await minioClient.fPutObject(process.env.MINIO_BUCKET, job.id + '/' + file, outputFolder + file)
-          jobStatus.outputFiles = outputFiles;
-        } catch (err: any) {
-          throw new Error(err)
-        } finally {
-          if (index === array.length - 1) resolve(0);
-        }
-      })
-    }))
-
-    jobStatus.responseTime = Date.now().toString();
     try {
+      writeLogs(tempProjectFolder, jobStdout, jobStderr);
+      await uploadOutputFilesToMinio(projectFolder, tempProjectFolder, job, jobStatus);
+
+      jobStatus.responseTime = Date.now().toString();
       execSync(`rm -rf ${projectFolder}`)
     } catch (err: any) { }
     return jobStatus;
   }
 
+}
+
+async function uploadOutputFilesToMinio(projectFolder: string, tempProjectFolder: string, job: Job, jobStatus: JobStatus) {
+  const outputFolder = projectFolder + '/output/';
+  const outputFiles = readdirSync(outputFolder);
+
+  const outputFolderTemp = tempProjectFolder + '/output/';
+  const outputFilesTemp = readdirSync(outputFolderTemp);
+
+  await uploadFilesToMinio(outputFiles, job, outputFolder, jobStatus);
+  await uploadFilesToMinio(outputFilesTemp, job, outputFolderTemp, jobStatus);
+
+  jobStatus.outputFiles = outputFiles;
+  jobStatus.outputFiles.push(...outputFilesTemp);
+}
+
+async function uploadFilesToMinio(outputFiles: string[], job: Job, outputFolder: string, jobStatus: JobStatus) {
+  
+  await (new Promise((resolve, reject) => {
+    outputFiles.forEach(async (file, index, array) => {
+      try {
+        await minioClient.fPutObject(process.env.MINIO_BUCKET, job.id + '/' + file, outputFolder + file);
+        // jobStatus.outputFiles = outputFiles;
+      } catch (err: any) {
+        throw new Error(err);
+      } finally {
+        if (index === array.length - 1)
+          resolve(0);
+      }
+    });
+  }));
 }
 
 function writeLogs(projectFolder: string, jobStdout: string, jobStderr: string) {

@@ -1,7 +1,7 @@
 import { Router } from 'express'
 import { checkServerStatus, getLoad } from '../service/statusService/statusService';
 import { Keycloak } from 'keycloak-connect';
-import { getKeycloak } from '../utils/keycloak/keycloakConfig';
+import { getKeycloak } from '../utils/keycloak/keycloak';
 
 const statusRoutes = Router();
 const keycloak: Keycloak = getKeycloak();
