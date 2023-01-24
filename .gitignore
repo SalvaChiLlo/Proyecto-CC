@@ -1,4 +1,6 @@
 **/keycloak.json
+.kumori
+.tmp
 # Logs
 logs
 *.log
