@@ -14,15 +14,19 @@ import k "kumori.systems/kumori:kumori"
     }
 
     config: {
-      resource: {
+      parameter: {
+        postgres_db: string
+        postgres_username: string
+        postgres_password: string
+        pgdata: "/var/lib/postgresql/data/pgdata"
+      }
+      resource: { 
         postgres_vol: k.#Volume
-        postgres_db: k.#Secret
-        postgres_password: k.#Secret
       }
     }
-    
+
     size: {
-      bandwidth: { size: 15, unit: "M" }
+      bandwidth: { size: 1000, unit: "M" }
     }
 
     code: postgres: {
@@ -30,12 +34,18 @@ import k "kumori.systems/kumori:kumori"
       image: {
         hub: { name: "", secret: "" }
         tag: "postgres:15"
-      }      
+      }     
+
+      user: {
+        userid: 0
+        groupid: 0
+      }
+
       mapping: {
         env: {
-          POSTGRES_DB: secret: "postgres_db"
-          POSTGRES_PASSWORD: secret: "postgres_password"
-          PGDATA: value: "/var/lib/postgresql/data/pgdata"
+          POSTGRES_DB: parameter: "postgres_db"
+          POSTGRES_PASSWORD: parameter: "postgres_password"
+          PGDATA: parameter: "pgdata"
         }
         filesystem: {
           "/var/lib/postgresql/data": {
@@ -45,9 +55,9 @@ import k "kumori.systems/kumori:kumori"
 
       }
       size: {
-        memory: { size: 100, unit: "M" }
-        mincpu: 100
-        cpu: { size: 200, unit: "m" }
+        memory: { size: 4, unit: "G" }
+        mincpu: 1000
+        cpu: { size: 2000, unit: "m" }
       }
     }
 

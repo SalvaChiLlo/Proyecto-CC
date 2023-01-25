@@ -10,14 +10,21 @@ import (
   name: "security_depl"
   artifact: s.#Artifact
   config: {
+    parameter: {
+      postgres: {
+        postgres_db: "keycloak"
+        postgres_username: "postgres"
+        postgres_password: "adminadmin"
+      }
+      keycloak: {
+        keycloak_admin: "admin"
+      }
+    }
     resource: {
-      postgres_vol: volume: "postgres_vol"
-      postgres_db: secret: "postgres_db"
-      postgres_db_url: secret: "postgres_db_url"
-      postgres_username: secret: "postgres_username"
-      postgres_password: secret: "postgres_password"
-      keycloak_admin: secret: "keycloak_admin"
+      postgres_vol: volume: { size: 5, unit: "G"}
       keycloak_admin_password: secret: "keycloak_admin_password"
+      servercert: certificate: "cluster.core/wildcard-vera-kumori-cloud"
+      domain: domain: "kc"
     }
     scale: detail: {
       keycloak: hsize: 1
