@@ -1,7 +1,19 @@
 # Proyecto Cloud Computing
 
 ## Frontend
-### /health
+Resumen de funcionalidad disponible:
+* /health
+  * / -> Indica si el servidor está en funcionamiento
+  * /load -> Indica la carga del servidor
+* /api
+  * /addJob -> Añadir nuevo trabajo
+  * /status -> Obtener estado de todos los trabajos del usuario
+    * /status/:id -> Obtener estado del trabajo `id` del usuario
+  * /results/:id/:file -> Obtener archivo `file` del trabajo `id`
+  * /deleteJob/:id -> Eliminar trabajo de la cola de trabajos
+* /auth
+  * /:user/:password -> Inicio de sesión con usuario y contraseña, devuelve un bearer token
+# /health
 #### GET /
 ##### Response
 ```
@@ -32,7 +44,7 @@ response: [
           ]
 ```
 
-### /api
+# /api
 #### POST /addJob
 ##### Request
 ```
@@ -100,7 +112,21 @@ headers:
 response: File Download
 ```
 
-### /auth
+#### GET /deleteJob/{id}
+##### Request
+```
+headers:
+  Authorization: Bearer yourBearerToken
+```
+##### Response
+```
+response: 
+  `El trabajo ${jobId} ha sido eliminado.`
+  o
+  `El trabajo ${jobId} no existe o no te pertenece.`
+```
+
+# /auth
 #### GET /{username}/{password}
 ##### Response
 ```
@@ -110,8 +136,8 @@ response: {
 ```
 
 ## Job definition standard
-Every project needs to initialize a npm project because we need package.json for launching with `npm run start`.
-This does not restric to just launch Javascript/Typescript projects. Inside your package.json, you can define any command to execute. For example:
+Cada trabajo necesita inicializar un proyecto npm porque necesitamos el archivo *package.json* para lanzarlo con `npm run start`.
+Esto no nos limita a solo lanzar proyectos Javascript/Typescript. Dentro del *package.json*, puedes definir cualquier comando a ejecutar. Por ejemplo:
 ``` json
 # For a JS project you could start it as follows:
 ...
@@ -130,6 +156,6 @@ This does not restric to just launch Javascript/Typescript projects. Inside your
 ...
 ```
 
-As explained in API definition, if you pass a config in the API call it will be written in your project root folder as *config.json*.
+Como se explica en la definición de la API, si se pasa una configuración en la llamada a la API, esta, se escribirá en la carpeta raíz del proyecto como *config.json*.
 
-If your project produces any output file, it has to be written in the output directory in the root directory of your project. This folder will be persisted so you can get back your results. 
+Si el proyecto produce cualquier archivo de salida, tiene que ser escrito en el directorio de salida *output* en la raíz de tu proyecto. Todo lo que se guarde en esta carpeta será guardado en Minio para que así después se puedan obtener los resultados del trabajo.
