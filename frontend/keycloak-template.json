@@ -1,9 +1,0 @@
-{
-  "resource": "CLIENT",
-  "realm": "REALM",
-  "auth-server-url": "URL",
-  "bearer-only": true,
-  "credentials": {
-    "secret": "SECRET"
-  }
-}

@@ -1,6 +1,6 @@
 import axios, { AxiosError, AxiosResponse } from 'axios';
+import {readFileSync} from 'fs'
 import qs from "qs";
-import kcconfig from '../../../keycloak.json';
 
 export async function login(user: string, password: string): Promise<any> {
   let message: any;
@@ -17,6 +17,8 @@ export async function login(user: string, password: string): Promise<any> {
 }
 
 function getToken(user: string, password: string): Promise<AxiosResponse> {
+  const kcconfig = JSON.parse(readFileSync("keycloak.json").toString())
+  
   const data = qs.stringify({
     grant_type: 'password',
     client_id: kcconfig.resource,
@@ -34,6 +36,7 @@ function getToken(user: string, password: string): Promise<AxiosResponse> {
     },
     data,
   };
+  console.log(config);
 
   return axios(config);
 }

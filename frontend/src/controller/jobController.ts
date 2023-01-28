@@ -44,6 +44,8 @@ jobRoutes.get('/results/:id/:file', keycloak.protect(), async (req, res) => {
   } catch (err: any) {
     console.log(err);
 
+    res.removeHeader('Content-disposition')
+    res.removeHeader('Content-Type')
     res.status(404)
     res.send(err.message)
   }

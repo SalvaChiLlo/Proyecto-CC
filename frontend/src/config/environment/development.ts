@@ -26,5 +26,12 @@ module.exports = {
   MINIO_ACCESS_KEY: process.env.MINIO_ACCESS_KEY,
   
   MINIO_SECRET_KEY: process.env.MINIO_SECRET_KEY,
-  
+
+  KEYCLOAK_CLIENT: process.env.KEYCLOAK_CLIENT,
+
+  KEYCLOAK_REALM: process.env.KEYCLOAK_REALM,
+
+  KEYCLOAK_URL: process.env.KEYCLOAK_URL,
+
+  KEYCLOAK_SECRET: process.env.KEYCLOAK_SECRET,
 }

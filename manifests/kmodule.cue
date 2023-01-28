@@ -13,11 +13,20 @@ package kmodule
 		1,
 		0,
 	]
-	dependencies: "kumori.systems/kumori": {
-		query:  "1.0.11"
-		target: "kumori.systems/kumori/@1.0.11"
+	dependencies: {
+		"kumori.systems/kumori": {
+			query:  "1.0.11"
+			target: "kumori.systems/kumori/@1.0.11"
+		}
+		"kumori.systems/builtins/inbound": {
+			query:  "1.1.0"
+			target: "kumori.systems/builtins/inbound/@1.1.0"
+		}
 	}
-	sums: {}
+	sums: {
+		"kumori.systems/kumori/@1.0.11":          "wEmCo3JdBB/eOBCqEXTltNjCypVjgEX/x8LKfMnlYN0="
+		"kumori.systems/builtins/inbound/@1.1.0": "hj+cMB0LhH0c6S30FpuuOd5KsMpmaFZVgukDWMkZCxA="
+	}
 	artifacts: {
 		frontend:           "component"
 		worker:             "component"

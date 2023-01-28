@@ -1,6 +1,6 @@
 package component
 
-import k "kumori.systems/kumori:kumori"
+// import k "kumori.systems/kumori:kumori"
 
 #Artifact: {
   ref: name:  "observer"
@@ -14,35 +14,38 @@ import k "kumori.systems/kumori:kumori"
     }
 
     config: {
+      parameter: {
+        observer_node_env: string
+        kafka_url: string
+        refresh_rate: number
+      }
       resource: {
-        observer_node_env: k.#Secret
-        kafka_clusters_0_bootstrapservers: k.#Secret
-        refresh_rate: k.#Secret
+
       }
     }
     
     size: {
-      bandwidth: { size: 15, unit: "M" }
+      bandwidth: { size: 100, unit: "M" }
     }
 
     code: observer: {
       name: "observer"
       image: {
         hub: { name: "", secret: "" }
-        tag: "salvachll/observer-proyectocc"
+        tag: "salvachll/observer-proyectocc:latest"
       }      
       mapping: {
         env: {
-          NODE_ENV: secret: "observer_node_env"
-          PRODUCTION_KAFKA_URL: secret: "kafka_clusters_0_bootstrapservers"
-          REFRESH_RATE: secret: "refresh_rate"
+          NODE_ENV: parameter: "observer_node_env"
+          PRODUCTION_KAFKA_URL: parameter: "kafka_url"
+          REFRESH_RATE: parameter: "refresh_rate"
         }
 
       }
       size: {
-        memory: { size: 100, unit: "M" }
-        mincpu: 100
-        cpu: { size: 200, unit: "m" }
+        memory: { size: 2, unit: "G" }
+        mincpu: 1000
+        cpu: { size: 2000, unit: "m" }
       }
     }
 

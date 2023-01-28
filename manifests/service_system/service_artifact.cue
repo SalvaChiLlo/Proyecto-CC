@@ -2,12 +2,11 @@ package service
 
 import (
   k "kumori.systems/kumori:kumori"
+  i "kumori.systems/builtins/inbound/@1.1.0/inbound:service"
   zk ".../zookeeper:component"
   kf ".../kafka:component"
-  // ku ".../kafka_ui:component"
   mi ".../minio:component"
   mg ".../mongo:component"
-  // me ".../mongo_express:component"
   wo ".../worker:component"
   fr ".../frontend:component"
   ob ".../observer:component"
@@ -18,50 +17,67 @@ import (
 
   description: {
     config: {
+      parameter: {
+        type: "https"
+        websocket: true
+        frontend_node_env: string
+        frontend_production_port: number
+        frontend_prodution_ip: string
+        mongo_host: string
+        kafka_cfg_zookeeper_connect: string
+        kafka_cfg_num_partitions: number
+        allow_plaintext_listener: string
+        kafka_cfg_listener: string
+        minio_server_url: string
+        mongo_db: string
+        observer_node_env: string
+        refresh_rate: number
+        worker_node_env: string
+        worker_data_folder: string
+        kafka_url: string
+        minio_url: string
+        minio_port: number
+        minio_bucket: string
+        partition_factor: number
+        zookeeper_client_port: number
+        zookeeper_tick_time: number
+      }
       resource: {
-        zookeeper_client_port: k.#Secret
-        zookeeper_tick_time: k.#Secret
-        kafka_broker_id: k.#Secret
-        kafka_zookeeper_connect: k.#Secret
-        kafka_advertised_listeners: k.#Secret
-        kafka_listener_security_protocol_map: k.#Secret
-        kafka_inter_broker_listener_name: k.#Secret
-        kafka_offsets_topic_replication_factor: k.#Secret
-        kafka_clusters_0_name: k.#Secret
-        kafka_clusters_0_bootstrapservers: k.#Secret
-        kafka_clusters_0_metrics_port: k.#Secret
-        minio_root_user: k.#Secret
-        minio_root_password: k.#Secret
-        minio_server_url: k.#Secret
-        minio_port: k.#Secret
-        minio_url: k.#Secret
-        minio_bucket: k.#Secret
-        pgdata: k.#Secret
-        mongo_username: k.#Secret
-        mongo_url: k.#Secret
-        mongo_password: k.#Secret
-        mongo_database: k.#Secret
-        mongo_host: k.#Secret
-        worker_node_env: k.#Secret
-        worker_data_folder: k.#Secret
-        partition_factor: k.#Secret
-        frontend_node_env: k.#Secret
-        frontend_production_port: k.#Secret
-        frontend_production_ip: k.#Secret
-        observer_node_env: k.#Secret
-        refresh_rate: k.#Secret
+        default_user: k.#Secret
+        default_password: k.#Secret
+        keycloak_client: k.#Secret
+        keycloak_realm: k.#Secret
+        keycloak_url: k.#Secret
+        keycloak_secret: k.#Secret
         mongo_vol: k.#Volume
         minio_vol: k.#Volume
+        zookeeper_vol: k.#Volume
+        kafka_vol: k.#Volume
+        servercert: k.#Certificate
+        serverdomain: k.#Domain
       }      
     }
 
     role: {
+      frontinbound: {
+        artifact: i.#Artifact
+        config: {
+          resource: {
+            servercert: description.config.resource.servercert
+            serverdomain: description.config.resource.serverdomain
+          }
+        }
+      }
+
       zookeeper: {
         artifact: zk.#Artifact
         config: {
-          resource: {
-            zookeeper_client_port: description.config.resource.zookeeper_client_port
-            zookeeper_tick_time: description.config.resource.zookeeper_tick_time
+          parameter: {
+            zookeeper_client_port: description.config.parameter.zookeeper_client_port
+            zookeeper_tick_time: description.config.parameter.zookeeper_tick_time
+          }
+          resource: { 
+            zookeeper_vol: description.config.resource.zookeeper_vol
           }
           resilience: description.config.resilience
         }
@@ -70,40 +86,29 @@ import (
       kafka: {
         artifact: kf.#Artifact
         config: {
-          resource: {
-            kafka_broker_id: description.config.resource.kafka_broker_id
-            kafka_zookeeper_connect: description.config.resource.kafka_zookeeper_connect
-            kafka_advertised_listeners: description.config.resource.kafka_advertised_listeners
-            kafka_listener_security_protocol_map: description.config.resource.kafka_listener_security_protocol_map
-            kafka_inter_broker_listener_name: description.config.resource.kafka_inter_broker_listener_name
-            kafka_offsets_topic_replication_factor: description.config.resource.kafka_offsets_topic_replication_factor
+          parameter: {
+            kafka_cfg_zookeeper_connect: description.config.parameter.kafka_cfg_zookeeper_connect
+            kafka_cfg_num_partitions: description.config.parameter.kafka_cfg_num_partitions
+            allow_plaintext_listener: description.config.parameter.allow_plaintext_listener
+            kafka_cfg_listener: description.config.parameter.kafka_cfg_listener
           }
+          resource: {
+            kafka_vol: description.config.resource.kafka_vol
+           }
           resilience: description.config.resilience
         }
       }
 
-      // kafka_ui: {
-      //   artifact: ku.#Artifact
-      //   config: {
-      //     resource: {
-      //       kafka_clusters_0_name: description.config.resource.kafka_clusters_0_name
-      //       kafka_clusters_0_bootstrapservers: description.config.resource.kafka_clusters_0_bootstrapservers
-      //       kafka_clusters_0_metrics_port: description.config.resource.kafka_clusters_0_metrics_port
-      //     }
-      //     resilience: description.config.resilience
-      //   }
-      // }
-
       minio: {
         artifact: mi.#Artifact
         config: {
+          parameter: {
+            minio_server_url: description.config.parameter.minio_server_url
+            minio_bucket: description.config.parameter.minio_bucket
+          }
           resource: {
-            minio_root_user: description.config.resource.minio_root_user
-            minio_root_password: description.config.resource.minio_root_password
-            minio_server_url: description.config.resource.minio_server_url
-            minio_port: description.config.resource.minio_port
-            minio_url: description.config.resource.minio_url
-            minio_bucket: description.config.resource.minio_bucket
+            default_user: description.config.resource.default_user
+            default_password: description.config.resource.default_password
             minio_vol: description.config.resource.minio_vol
           }
           resilience: description.config.resilience
@@ -113,41 +118,34 @@ import (
       mongo: {
         artifact: mg.#Artifact
         config: {
+          parameter: {
+            mongo_db: description.config.parameter.mongo_db
+          }
           resource: {
-            mongo_username: description.config.resource.mongo_username
-            mongo_password: description.config.resource.mongo_password
-            mongo_database: description.config.resource.mongo_database
+            default_user: description.config.resource.default_user
+            default_password: description.config.resource.default_password
             mongo_vol: description.config.resource.mongo_vol
           }
           resilience: description.config.resilience
         }
       }
 
-    //  mongo_express: {
-    //     artifact: me.#Artifact
-    //     config: {
-    //       resource: {
-    //         mongo_username: description.config.resource.mongo_username
-    //         mongo_url: description.config.resource.mongo_url
-    //         mongo_password: description.config.resource.mongo_password
-    //       }
-    //       resilience: description.config.resilience
-    //     }
-    //   }
-
       worker: {
         artifact: wo.#Artifact
         config: {
+          parameter: {
+            worker_node_env: description.config.parameter.worker_node_env
+            worker_data_folder: description.config.parameter.worker_data_folder
+            kafka_url: description.config.parameter.kafka_url
+            minio_url: description.config.parameter.minio_url
+            minio_port: description.config.parameter.minio_port
+            minio_bucket: description.config.parameter.minio_bucket
+            partition_factor: description.config.parameter.partition_factor
+          }
           resource: {
-            worker_node_env: description.config.resource.worker_node_env
-            kafka_clusters_0_bootstrapservers: description.config.resource.kafka_clusters_0_bootstrapservers
-            worker_data_folder: description.config.resource.worker_data_folder
-            minio_url: description.config.resource.minio_url
-            minio_port: description.config.resource.minio_port
-            minio_bucket: description.config.resource.minio_bucket
-            minio_root_user: description.config.resource.minio_root_user
-            minio_root_password: description.config.resource.minio_root_password
-            partition_factor: description.config.resource.partition_factor
+            default_user: description.config.resource.default_user
+            default_password: description.config.resource.default_password
+            worker_vol: description.config.resource.worker_vol
           }
           resilience: description.config.resilience
         }
@@ -156,20 +154,24 @@ import (
       frontend: {
         artifact: fr.#Artifact
         config: {
-          resource: {
-            frontend_node_env: description.config.resource.frontend_node_env
-            frontend_production_port: description.config.resource.frontend_production_port
-            frontend_production_ip: description.config.resource.frontend_production_ip
-            kafka_clusters_0_bootstrapservers: description.config.resource.kafka_clusters_0_bootstrapservers
-            minio_url: description.config.resource.minio_url
-            minio_port: description.config.resource.minio_port
-            minio_bucket: description.config.resource.minio_bucket
-            minio_root_user: description.config.resource.minio_root_user
-            minio_root_password: description.config.resource.minio_root_password
-            mongo_database: description.config.resource.mongo_database
-            mongo_host: description.config.resource.mongo_host
-            mongo_username: description.config.resource.mongo_username
-            mongo_password: description.config.resource.mongo_password
+          parameter: {
+            frontend_node_env: description.config.parameter.frontend_node_env
+            frontend_production_port: description.config.parameter.frontend_production_port
+            frontend_prodution_ip: description.config.parameter.frontend_prodution_ip
+            kafka_url: description.config.parameter.kafka_url
+            minio_url: description.config.parameter.minio_url
+            minio_port: description.config.parameter.minio_port
+            minio_bucket: description.config.parameter.minio_bucket
+            mongo_db: description.config.parameter.mongo_db
+            mongo_host: description.config.parameter.mongo_host
+          }
+          resource: { 
+            default_user: description.config.resource.default_user
+            default_password: description.config.resource.default_password
+            keycloak_client: description.config.resource.keycloak_client
+            keycloak_realm: description.config.resource.keycloak_realm
+            keycloak_url: description.config.resource.keycloak_url
+            keycloak_secret: description.config.resource.keycloak_secret
           }
           resilience: description.config.resilience
         }
@@ -178,10 +180,13 @@ import (
       observer: {
         artifact: ob.#Artifact
         config: {
+          parameter: {
+            observer_node_env: description.config.parameter.observer_node_env
+            kafka_url: description.config.parameter.kafka_url
+            refresh_rate: description.config.parameter.refresh_rate
+          }
           resource: {
-            observer_node_env: description.config.resource.observer_node_env
-            kafka_clusters_0_bootstrapservers: description.config.resource.kafka_clusters_0_bootstrapservers
-            refresh_rate: description.config.resource.refresh_rate
+            
           }
           resilience: description.config.resilience
         }
@@ -189,47 +194,38 @@ import (
     }
 
     srv: {
-      server: {
-        service: { protocol: "http", port: 80 }
-      }
     }
 
     connect: {
       serviceconnector: {
         as: "lb"
-			  from: self: "service"
+        // Pueden haber varios from
+			  from: frontinbound: "inbound"
         to: frontend: "entrypoint": _
       }
-      // mongoconnector: {
-      //   as: "lb"
-      //   from: frontend: "mongoclient"
-      //   to: mongo: "mongoserver": _
-      // }
-      // minioconnector: {
-      //   as: "lb"
-      //   from: worker: "minioclient"
-      //   to: minio: "minioserver": _
-      // }
-      // frontendtokafka: {
-      //   as: "lb"
-      //   from: frontend: "kafkaclient"
-      //   to: kafka: "kafkaserver": _
-      // }
-      // workertokafka: {
-      //   as: "lb"
-      //   from: frontend: "kafkaclient"
-      //   to: kafka: "kafkaserver": _
-      // }
-      // observertokafka: {
-      //   as: "lb"
-      //   from: frontend: "kafkaclient"
-      //   to: kafka: "kafkaserver": _
-      // }
-      // kafkazookeeperconnector: {
-      //   as: "lb"
-      //   from: kafka: "zkclient"
-      //   to: zookeeper: "zkserver": _
-      // }
+      mongoconnector: {
+        as: "lb"
+        from: frontend: "mongoclient"
+        to: mongo: "mongoserver": _
+      }
+      minioconnector: {
+        as: "lb"
+        from: frontend: "minioclient"
+        from: worker: "minioclient"
+        to: minio: "minioserver": _
+      }
+      kafkaconnector: {
+        as: "lb"
+        from: frontend: "kafkaclient"
+        from: worker: "kafkaclient"
+        from: observer: "kafkaclient"
+        to: kafka: "kafkaserver": _
+      }
+      kafkazookeeperconnector: {
+        as: "lb"
+        from: kafka: "zkclient"
+        to: zookeeper: "zkserver": _
+      }
     }
   }
 }

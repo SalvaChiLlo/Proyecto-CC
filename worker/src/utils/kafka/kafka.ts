@@ -4,7 +4,11 @@ import { JobStatus } from "../../models/jobModel"
 
 export const kafka = new Kafka({
   clientId: 'worker',
-  brokers: config.kafka
+  brokers: config.kafka,
+  retry: {
+    maxRetryTime: 1200000,
+    retries: 100,
+  }
 })
 
 kafka.logger().setLogLevel(logLevel.ERROR)

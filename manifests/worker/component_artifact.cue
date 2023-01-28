@@ -15,46 +15,58 @@ import k "kumori.systems/kumori:kumori"
     }
 
     config: {
+      parameter: {
+        worker_node_env: string
+        worker_data_folder: string
+        kafka_url: string
+        minio_url: string
+        minio_port: number
+        minio_bucket: string
+        partition_factor: number
+      }
       resource: {
-        worker_node_env: k.#Secret
-        kafka_clusters_0_bootstrapservers: k.#Secret
-        worker_data_folder: k.#Secret
-        minio_url: k.#Secret
-        minio_port: k.#Secret
-        minio_bucket: k.#Secret
-        minio_root_user: k.#Secret
-        minio_root_password: k.#Secret
-        partition_factor: k.#Secret
+        worker_vol: k.#Volume
+        default_user: k.#Secret
+        default_password: k.#Secret
       }
     }
     
     size: {
-      bandwidth: { size: 15, unit: "M" }
+      bandwidth: { size: 100, unit: "M" }
     }
 
     code: worker: {
       name: "worker"
       image: {
         hub: { name: "", secret: "" }
-        tag: "salvachll/worker-proyectocc"
-      }      
+        tag: "salvachll/worker-proyectocc:latest"
+      }    
+
+      user: {
+        userid: 0
+        groupid: 0
+      }
+
       mapping: {
+        filesystem: {
+          "/jobexecutor": volume: "worker_vol"
+        }
         env: {
-          NODE_ENV: secret: "worker_node_env"
-          PRODUCTION_KAFKA_URL: secret: "kafka_clusters_0_bootstrapservers"
-          WORKER_DATA_FOLDER: secret: "worker_data_folder"
-          MINIO_URL: secret: "minio_url"
-          MINIO_PORT: secret: "minio_port"
-          MINIO_BUCKET: secret: "minio_bucket"
-          MINIO_ACCESS_KEY: secret: "minio_root_user"
-          MINIO_SECRET_KEY: secret: "minio_root_password"
-          PARTITION_FACTOR: secret: "partition_factor"
+          NODE_ENV: parameter: "worker_node_env"
+          WORKER_DATA_FOLDER: parameter: "worker_data_folder"
+          PRODUCTION_KAFKA_URL: parameter: "kafka_url"
+          MINIO_URL: parameter: "minio_url"
+          MINIO_PORT: parameter: "minio_port"
+          MINIO_BUCKET: parameter: "minio_bucket"
+          MINIO_ACCESS_KEY: secret: "default_user"
+          MINIO_SECRET_KEY: secret: "default_password"
+          PARTITION_FACTOR: parameter: "partition_factor"
         }
       }
       size: {
-        memory: { size: 100, unit: "M" }
-        mincpu: 100
-        cpu: { size: 200, unit: "m" }
+        memory: { size: 4, unit: "G" }
+        mincpu: 2000
+        cpu: { size: 4000, unit: "m" }
       }
     }
 

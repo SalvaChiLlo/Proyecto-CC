@@ -9,8 +9,8 @@ import { minioClient } from "../../utils/minio/minio";
 const jobsToIgnore: IgnoreJob[] = [];
 
 export default async function executeJob(job: Job): Promise<JobStatus> {
-  let jobStdout: string = "";
-  let jobStderr: string = "";
+  let jobStdout: string = "--- stdout ---\n";
+  let jobStderr: string = "--- stderr ---\n";
   const projectFolder = `${config.WORKER_DATA_FOLDER}/${job.id}`
   const tempProjectFolder = `/tmp/std/${job.id}`
   const jobStatus: JobStatus = {
@@ -62,13 +62,19 @@ export default async function executeJob(job: Job): Promise<JobStatus> {
 }
 
 async function uploadOutputFilesToMinio(projectFolder: string, tempProjectFolder: string, job: Job, jobStatus: JobStatus) {
+  console.log("Uploading files");
+  console.log("---------------");
+
   const outputFolder = projectFolder + '/output/';
   const outputFiles = readdirSync(outputFolder);
 
   const outputFolderTemp = tempProjectFolder + '/output/';
   const outputFilesTemp = readdirSync(outputFolderTemp);
 
+  console.log("Uploading", outputFiles);
   await uploadFilesToMinio(outputFiles, job, outputFolder, jobStatus);
+
+  console.log("Uploading", outputFilesTemp);
   await uploadFilesToMinio(outputFilesTemp, job, outputFolderTemp, jobStatus);
 
   jobStatus.outputFiles = outputFiles;
@@ -76,11 +82,17 @@ async function uploadOutputFilesToMinio(projectFolder: string, tempProjectFolder
 }
 
 async function uploadFilesToMinio(outputFiles: string[], job: Job, outputFolder: string, jobStatus: JobStatus) {
-  
+
   await (new Promise((resolve, reject) => {
+    if (outputFiles.length == 0) {
+      resolve(0);
+    }
     outputFiles.forEach(async (file, index, array) => {
       try {
+        console.log(file, "-- Uploading");
         await minioClient.fPutObject(process.env.MINIO_BUCKET, job.id + '/' + file, outputFolder + file);
+        console.log(file, "-- Uploaded");
+
         // jobStatus.outputFiles = outputFiles;
       } catch (err: any) {
         throw new Error(err);
@@ -93,9 +105,14 @@ async function uploadFilesToMinio(outputFiles: string[], job: Job, outputFolder:
 }
 
 function writeLogs(projectFolder: string, jobStdout: string, jobStderr: string) {
+  console.log("Writing logs");
+  console.log("------------");
+
   try {
-    writeFile(`${projectFolder}/output/stdout`, jobStdout.toString());
-    writeFile(`${projectFolder}/output/stderr`, jobStderr.toString());
+    writeFile(`${projectFolder}/output/stdout.txt`, jobStdout.toString());
+    console.log("stdout written")
+    writeFile(`${projectFolder}/output/stderr.txt`, jobStderr.toString());
+    console.log("stderr written")
   } catch (err: any) {
     console.error(err)
     throw new Error(err)

@@ -14,16 +14,18 @@ import k "kumori.systems/kumori:kumori"
     }
 
     config: {
+      parameter: {
+        mongo_db: string
+      }
       resource: {
-        mongo_username: k.#Secret
-        mongo_password: k.#Secret
-        mongo_database: k.#Secret
+        default_user: k.#Secret
+        default_password: k.#Secret
         mongo_vol: k.#Volume
       }
     }
     
     size: {
-      bandwidth: { size: 15, unit: "M" }
+      bandwidth: { size: 100, unit: "M" }
     }
 
     code: mongo: {
@@ -34,9 +36,9 @@ import k "kumori.systems/kumori:kumori"
       }      
       mapping: {
         env: {
-          MONGO_INITDB_ROOT_USERNAME: secret: "mongo_username"
-          MONGO_INITDB_ROOT_PASSWORD: secret: "mongo_password"
-          MONGO_INITDB_DATABASE: secret: "mongo_database"
+          MONGO_INITDB_ROOT_USERNAME: secret: "default_user"
+          MONGO_INITDB_ROOT_PASSWORD: secret: "default_password"
+          MONGO_INITDB_DATABASE: parameter: "mongo_db"
         }
         filesystem: {
           "/data/db": {
@@ -45,9 +47,9 @@ import k "kumori.systems/kumori:kumori"
         }
       }
       size: {
-        memory: { size: 100, unit: "M" }
-        mincpu: 100
-        cpu: { size: 200, unit: "m" }
+        memory: { size: 6, unit: "G" }
+        mincpu: 2000
+        cpu: { size: 4000, unit: "m" }
       }
     }
 

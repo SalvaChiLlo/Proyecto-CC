@@ -2,8 +2,6 @@
 
 CLUSTERNAME="..."
 REFERENCEDOMAIN="vera.kumori.cloud"
-INBOUNDNAME="system_in"
-SECURITY_INBOUNDNAME="security_kc"
 DEPLOYNAME="proyectoccdep"
 SECURITY_DEPLOYNAME="securitydepl"
 DOMAIN="proyectocc"
@@ -25,10 +23,21 @@ case $1 in
 'refresh-dependencies')
   cd manifests
 	${KAM_CMD} mod dependency --delete kumori.systems/kumori
+	${KAM_CMD} mod dependency --delete kumori.systems/builtins/inbound
 	${KAM_CMD} mod dependency kumori.systems/kumori/@1.0.11
+  ${KAM_CMD} mod dependency kumori.systems/builtins/inbound/@1.1.0
   ${KAM_CMD} mod relink
   cd ..
   ;;
+
+'create-secrets')
+  ${KUMORICTL_CMD} register secret default_user --from-data admin
+  ${KUMORICTL_CMD} register secret default_password --from-data adminadmin
+  ${KUMORICTL_CMD} register secret keycloak_client --from-data prodClient
+  ${KUMORICTL_CMD} register secret keycloak_realm --from-data proyectocc
+  ${KUMORICTL_CMD} register secret keycloak_url --from-data https://kc.vera.kumori.cloud/
+  ${KUMORICTL_CMD} register secret keycloak_secret --from-data tHWV8bz3Y1xCKjNrMQfYDKPXbdybtJLb
+;;
 
 'deploy-all')
   $0 refresh-dependencies
@@ -61,6 +70,7 @@ case $1 in
 
 
 'deploy-security-service')
+  ${KUMORICTL_CMD} register volume postgres_vol -s 5G -t persistent
   ${KUMORICTL_CMD} register deployment $SECURITY_DEPLOYNAME \
     --deployment ./manifests/deployment_security \
     --comment "Deploy KeyCloak and PostgreSQL" \
@@ -123,6 +133,17 @@ case $1 in
   ${KUMORICTL_CMD} unregister deployment $DEPLOYNAME --wait 5m --force
   ${KUMORICTL_CMD} unregister deployment $SECURITY_DEPLOYNAME --wait 5m --force
   ${KUMORICTL_CMD} unregister secret keycloak_admin_password
+  ${KUMORICTL_CMD} unregister volume postgres_vol
+  ;;
+
+'undeploy-system')
+  ${KUMORICTL_CMD} unregister deployment $DEPLOYNAME --wait 5m --force
+  ;;
+
+
+'undeploy-security')
+  ${KUMORICTL_CMD} unregister deployment $SECURITY_DEPLOYNAME --wait 5m --force
+  ${KUMORICTL_CMD} unregister volume postgres_vol
   ;;
 
 *)

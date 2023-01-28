@@ -14,14 +14,17 @@ import k "kumori.systems/kumori:kumori"
     }
 
     config: {
+      parameter: {
+        zookeeper_client_port: number
+        zookeeper_tick_time: number
+      }
       resource: {
-        zookeeper_client_port: k.#Secret
-        zookeeper_tick_time: k.#Secret
+        zookeeper_vol: k.#Volume
       }
     }
     
     size: {
-      bandwidth: { size: 15, unit: "M" }
+      bandwidth: { size: 100, unit: "M" }
     }
 
     code: zookeeper: {
@@ -32,14 +35,14 @@ import k "kumori.systems/kumori:kumori"
       }      
       mapping: {
         env: {
-          ZOOKEEPER_CLIENT_PORT: secret: "zookeeper_client_port"
-          ZOOKEEPER_TICK_TIME: secret: "zookeeper_tick_time"
+          ZOOKEEPER_CLIENT_PORT: parameter: "zookeeper_client_port"
+          ZOOKEEPER_TICK_TIME: parameter: "zookeeper_tick_time"
         }
       }
       size: {
-        memory: { size: 100, unit: "M" }
-        mincpu: 100
-        cpu: { size: 200, unit: "m" }
+        memory: { size: 1, unit: "G" }
+        mincpu: 500
+        cpu: { size: 2000, unit: "m" }
       }
     }
 

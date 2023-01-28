@@ -149,8 +149,10 @@ services:
       - MONGO_HOST=${MONGO_HOST}
       - MONGO_USERNAME=${MONGO_USERNAME}
       - MONGO_PASSWORD=${MONGO_PASSWORD}
-    volumes:
-      - ${PWD}/keycloak.json:/usr/src/app/build/app/keycloak.json
+      - KEYCLOAK_CLIENT=${KEYCLOAK_CLIENT}
+      - KEYCLOAK_REALM=${KEYCLOAK_REALM}
+      - KEYCLOAK_URL=${KEYCLOAK_URL}
+      - KEYCLOAK_SECRET=${KEYCLOAK_SECRET}
     ports:
       - 80:9000
 

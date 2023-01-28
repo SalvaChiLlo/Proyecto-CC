@@ -14,17 +14,19 @@ import k "kumori.systems/kumori:kumori"
     }
 
     config: {
+      parameter: {
+        minio_server_url: string
+        minio_bucket: string
+      }
       resource: {
-        minio_root_user: k.#Secret
-        minio_root_password: k.#Secret
-        minio_server_url: k.#Secret
-        minio_bucket: k.#Secret
+        default_user: k.#Secret
+        default_password: k.#Secret
         minio_vol: k.#Volume
       }
     }
     
     size: {
-      bandwidth: { size: 15, unit: "M" }
+      bandwidth: { size: 1000, unit: "M" }
     }
 
     code: minio: {
@@ -37,10 +39,10 @@ import k "kumori.systems/kumori:kumori"
       cmd: ["mkdir -p /data/proyecto-cc && echo /data/proyecto-cc && echo $MINIO_BUCKET && minio server /data --console-address \":9090\""]  
       mapping: {
         env: {
-          MINIO_ROOT_USER: secret: "minio_root_user"
-          MINIO_ROOT_PASSWORD: secret: "minio_root_password"
-          MINIO_SERVER_URL: secret: "minio_server_url"
-          MINIO_BUCKET: secret: "minio_bucket"
+          MINIO_ROOT_USER: secret: "default_user"
+          MINIO_ROOT_PASSWORD: secret: "default_password"
+          MINIO_SERVER_URL: parameter: "minio_server_url"
+          MINIO_BUCKET: parameter: "minio_bucket"
         }
         filesystem: {
           "/data": {
@@ -50,9 +52,9 @@ import k "kumori.systems/kumori:kumori"
 
       }
       size: {
-        memory: { size: 100, unit: "M" }
-        mincpu: 100
-        cpu: { size: 200, unit: "m" }
+        memory: { size: 4, unit: "G" }
+        mincpu: 2000
+        cpu: { size: 4000, unit: "m" }
       }
     }
 
