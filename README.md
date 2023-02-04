@@ -1,4 +1,5 @@
 # Proyecto Cloud Computing
+Para probar el proyecto importa este [workspace](https://drive.google.com/file/d/1v40CR2Zep56AS6RJgTOrSt_NRk_AAE9I/view?usp=share_link) en [Postman](https://www.postman.com/).
 
 ## Frontend
 Resumen de funcionalidad disponible:
